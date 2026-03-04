@@ -63,7 +63,7 @@ class ExaNewsGatherer:
 
         # 调用 Exa API
         try:
-            results = self._search_exa(query, date_str, num_results, use_autoprompt, time_range)
+            results = self._search_exa(query, num_results, use_autoprompt, time_range)
             logger.info(f"从 Exa 获取到 {len(results)} 条原始结果")
 
             # 客户端过滤
@@ -83,14 +83,13 @@ class ExaNewsGatherer:
                 return self._load_cache()
             raise
 
-    def _search_exa(self, query: str, date_str: str, num_results: int,
+    def _search_exa(self, query: str, num_results: int,
                     use_autoprompt: bool, time_range: str) -> List[Dict]:
         """
         调用 Exa API 进行搜索
 
         Args:
             query: 搜索查询
-            date_str: 日期字符串 (YYYYMMDD)
             num_results: 返回结果数量
             use_autoprompt: 是否使用自动提示优化
             time_range: 时间范围 (24h 或 48h)
@@ -99,7 +98,7 @@ class ExaNewsGatherer:
             Exa API 返回的结果列表
         """
         # 计算日期范围
-        start_date, end_date = self._calculate_date_range(date_str, time_range)
+        start_date, end_date = self._calculate_date_range(time_range)
 
         # 构建请求 payload
         payload = {
@@ -143,19 +142,18 @@ class ExaNewsGatherer:
         results = data.get('results', [])
         return results
 
-    def _calculate_date_range(self, date_str: str, time_range: str) -> tuple:
+    def _calculate_date_range(self, time_range: str) -> tuple:
         """
         计算搜索的日期范围
 
         Args:
-            date_str: 日期字符串 (YYYYMMDD)
             time_range: 时间范围 (24h 或 48h)
 
         Returns:
             (start_date, end_date) ISO 格式字符串
         """
-        # 解析目标日期
-        target_date = datetime.strptime(date_str, '%Y%m%d')
+        # end_date 为当前时间
+        end_date = datetime.now()
 
         # 计算时间范围
         if time_range == '48h':
@@ -163,8 +161,7 @@ class ExaNewsGatherer:
         else:
             hours = 24
 
-        start_date = target_date - timedelta(hours=hours)
-        end_date = target_date + timedelta(hours=23, minutes=59, seconds=59)
+        start_date = end_date - timedelta(hours=hours)
 
         # 转换为 ISO 格式
         start_iso = start_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
