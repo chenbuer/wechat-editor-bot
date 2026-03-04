@@ -1,0 +1,57 @@
+name: Test Financial News Bot
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'auto-wechat/**'
+      - '.github/workflows/test-news-bot.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'auto-wechat/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: uv sync
+
+    - name: Run structure validation
+      run: uv run python test_structure.py
+
+    - name: Run bot in mock mode
+      run: uv run python finance_news_bot.py --mock
+
+    - name: Check generated files
+      run: |
+        echo "检查生成的文件..."
+        ls -lh output/articles/ || echo "无文章生成"
+        ls -lh output/html/ || echo "无 HTML 生成"
+        ls -lh output/images/ || echo "无图片生成"
+
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-output-${{ github.run_number }}
+        path: |
+          output/**/*
+          "*.log"
+        retention-days: 7

@@ -1,0 +1,68 @@
+# 财经新闻自动化系统配置
+# 非敏感配置 - 可以提交到 Git
+# 敏感信息（API Key, AppID 等）请配置在 secrets.yaml
+
+# 新闻采集配置
+news:
+  # 搜索时间范围（从当前时间往前推算）
+  time_range: "24h"  # 24h 或 48h
+
+  # Exa 搜索配置
+  exa_search:
+    enabled: true
+    # 综合查询（覆盖所有主题：新闻 + 市场数据）
+    query: "最新财经新闻 股市行情 A股港股美股指数 经济数据指标 宏观政策 国际经济动态"
+    num_results: 50
+    use_autoprompt: true
+
+    # 可选：域名过滤（留空则不限制）
+    include_domains: []
+    # 示例：指定高质量财经媒体
+    # - "cailianshe.com"
+    # - "jin10.com"
+    # - "reuters.com"
+    # - "bloomberg.com"
+    # - "wallstreetcn.com"
+    # - "ftchinese.com"
+
+  # 排除关键词（客户端过滤）
+  exclude_keywords:
+    - "加密货币"
+    - "比特币"
+    - "赌博"
+
+# 文章生成配置
+article:
+  # 文章标题格式
+  title_format: "不大早的财经早报 | {date}"  # {date} 会被替换为日期
+
+  # 文章风格
+  style: "professional_engaging"  # 专业且引人入胜
+  min_length: 1200  # 最小字数
+  max_length: 1800  # 最大字数
+  include_summary: true
+
+# 图片生成配置
+image:
+  primary_size: "3000x1276"      # 微信公众号主图尺寸
+  secondary_size: "2000x2000"    # 微信公众号次图尺寸
+  style: "oil_painting"        # 图片风格
+  mood: "relaxing"             # 氛围：relaxing, energetic, professional
+
+# 天气服务配置
+weather:
+  location: "Nanjing"         # 城市名称（支持中英文）
+
+# 微信发布配置
+wechat:
+  auto_publish: false          # 安全起见：仅创建草稿，不自动发布
+  create_draft: true           # 创建草稿
+  theme: "ocean"               # HTML 主题：fresh, ocean
+  author: "Jasper"            # 文章作者
+  enable_comment: true        # 是否开启评论
+  only_fans_comment: false     # 是否仅粉丝可评论
+
+# 文件管理配置
+cleanup:
+  keep_days: 3                # 保留天数
+  archive_enabled: true        # 启用归档
