@@ -11,7 +11,7 @@
 ### 使用 uv（推荐）
 
 ```bash
-cd auto-wechat
+cd wechat-editor-bot
 
 # 1. 安装 uv（如果未安装）
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -26,7 +26,7 @@ python tests/test_structure.py
 ### 使用 pip
 
 ```bash
-cd auto-wechat
+cd wechat-editor-bot
 
 # 1. 创建虚拟环境（推荐）
 python3 -m venv .venv

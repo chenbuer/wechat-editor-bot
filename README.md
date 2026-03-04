@@ -30,7 +30,7 @@
 ```bash
 # 克隆项目
 git clone <your-repo-url>
-cd auto-wechat
+cd wechat-editor-bot
 
 # 推荐使用 uv（更快）
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -91,7 +91,7 @@ uv run python finance_news_bot.py --config custom_config.yaml --secrets custom_s
 ## 📁 项目结构
 
 ```
-auto-wechat/
+wechat-editor-bot/
 ├── finance_news_bot.py          # 主程序入口
 ├── pyproject.toml               # 项目配置和依赖
 ├── uv.lock                      # 依赖锁定文件
@@ -210,7 +210,7 @@ wechat:
 crontab -e
 
 # 每天 7:00 运行
-0 7 * * * cd /path/to/auto-wechat && uv run python finance_news_bot.py >> logs/cron.log 2>&1
+0 7 * * * cd /path/to/wechat-editor-bot && uv run python finance_news_bot.py >> logs/cron.log 2>&1
 ```
 
 ## 💰 成本估算

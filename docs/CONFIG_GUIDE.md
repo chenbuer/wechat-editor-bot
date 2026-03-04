@@ -256,12 +256,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd auto-wechat
+        cd wechat-editor-bot
         pip install -r requirements.txt
 
     - name: Create secrets.yaml from GitHub Secrets
       run: |
-        cd auto-wechat
+        cd wechat-editor-bot
         cat > config/secrets.yaml << EOF
         wechat:
           appid: "${{ secrets.WECHAT_APPID }}"
@@ -276,7 +276,7 @@ jobs:
 
     - name: Run financial news bot
       run: |
-        cd auto-wechat
+        cd wechat-editor-bot
         python finance_news_bot.py
 
     - name: Upload artifacts
@@ -285,10 +285,10 @@ jobs:
       with:
         name: news-output
         path: |
-          auto-wechat/output/articles/*.md
-          auto-wechat/output/html/*.html
-          auto-wechat/output/images/*.jpg
-          auto-wechat/*.log
+          wechat-editor-bot/output/articles/*.md
+          wechat-editor-bot/output/html/*.html
+          wechat-editor-bot/output/images/*.jpg
+          wechat-editor-bot/*.log
 ```
 
 ### 3. 手动触发工作流
