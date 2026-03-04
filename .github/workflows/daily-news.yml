@@ -43,6 +43,9 @@ jobs:
           secret: "${{ secrets.WECHAT_SECRET }}"
 
         api:
+          # Exa API（用于新闻搜索）
+          exa_api_key: "${{ secrets.EXA_API_KEY }}"
+
           # DeepSeek API（推荐）
           deepseek_key: "${{ secrets.DEEPSEEK_API_KEY }}"
           deepseek_base_url: "https://api.deepseek.com"
@@ -50,6 +53,9 @@ jobs:
 
           # Claude API（备选）
           anthropic_key: "${{ secrets.ANTHROPIC_API_KEY }}"
+
+          # 天气 API（可选）
+          weather_api_key: "${{ secrets.WEATHER_API_KEY }}"
 
           # 图片生成 API
           image_provider: "${{ secrets.IMAGE_PROVIDER }}"
