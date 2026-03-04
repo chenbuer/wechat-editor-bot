@@ -34,7 +34,7 @@ jobs:
       run: uv sync
 
     - name: Run structure validation
-      run: uv run python test_structure.py
+      run: uv run python tests/test_structure.py
 
     - name: Run bot in mock mode
       run: uv run python finance_news_bot.py --mock
