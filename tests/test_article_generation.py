@@ -5,6 +5,13 @@
 只测试核心功能，不涉及新闻采集、图片生成、微信发布等
 """
 
+import sys
+from pathlib import Path
+
+# 添加项目根目录到 Python 路径
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 import logging
 import yaml
 from pathlib import Path
@@ -42,8 +49,8 @@ def load_secrets(secrets_path: str) -> dict:
 def main():
     """主函数"""
     # 加载配置
-    config_path = Path(__file__).parent / 'config' / 'finance_news_config.yaml'
-    secrets_path = Path(__file__).parent / 'config' / 'secrets.yaml'
+    config_path = Path(__file__).parent.parent / 'config' / 'finance_news_config.yaml'
+    secrets_path = Path(__file__).parent.parent / 'config' / 'secrets.yaml'
 
     config = load_config(str(config_path))
     secrets = load_secrets(str(secrets_path))

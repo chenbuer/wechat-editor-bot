@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test-article-20260304</title>
+    <style>
+
+/* 主容器 */
+.wechat-content {
+    background-color: #f0f4f8;
+    padding: 40px 16px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #3a4150;
+    letter-spacing: 0.2px;
+}
+
+/* 内容卡片 */
+.content-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    background-image: linear-gradient(rgba(74, 124, 155, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 124, 155, 0.03) 1px, transparent 1px); background-size: 24px 24px;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(58, 65, 80, 0.06), 0 0 16px rgba(74, 124, 155, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 标题样式 */
+h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #3d6a8a;
+    margin: 20px 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #4a7c9b;
+    line-height: 1.4;
+}
+
+/* 大章节标题 - 带背景色 */
+h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #4a7c9b;
+    margin: 20px 0 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #e8f0f8 0%, rgba(255,255,255,0.5) 100%);
+    border-left: 4px solid #4a7c9b;
+    border-radius: 6px;
+    line-height: 1.4;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 编者按标题不应用通用 h2 样式 */
+.editor-note-card h2 {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 14px 20px 10px 20px;
+    margin: 0;
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #3d6a8a;
+    margin: 16px 0 10px;
+    line-height: 1.4;
+    display: inline-block;
+    border-bottom: 2px solid #4a7c9b;
+    padding-bottom: 4px;
+}
+
+h4, h5, h6 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #3d6a8a;
+    margin: 14px 0 10px;
+    line-height: 1.4;
+}
+
+/* 段落 */
+p {
+    margin: 12px 0;
+    text-align: justify;
+    color: #3a4150;
+    line-height: 1.75;
+}
+
+/* 编者按卡片容器 */
+.editor-note-card {
+    margin: 20px 0;
+    background: linear-gradient(135deg, #e8f0f8 0%, #fff 100%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #4a7c9b;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* 编者按标题 */
+.editor-note-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4a7c9b;
+    margin: 0;
+    padding: 14px 20px 10px 20px;
+    line-height: 1.4;
+}
+
+/* 编者按内容 */
+.editor-note-content {
+    margin: 0;
+    padding: 0 20px 14px 20px;
+    text-align: justify;
+    color: #555;
+    line-height: 1.75;
+    font-style: italic;
+    font-size: 15px;
+}
+
+/* 免责声明 - 小字提示 */
+.disclaimer-text {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 30px 0 20px;
+    padding: 0 20px;
+}
+
+/* 强调 */
+strong {
+    color: #3d6a8a;
+    font-weight: 600;
+}
+
+em {
+    color: #4a7c9b;
+    font-style: italic;
+}
+
+/* 链接 */
+a {
+    color: #4a7c9b;
+    text-decoration: none;
+    border-bottom: 1px solid #4a7c9b;
+    transition: all 0.3s;
+}
+
+a:hover {
+    color: #3d6a8a;
+    border-bottom-color: #3d6a8a;
+}
+
+/* 引用块 */
+blockquote {
+    margin: 16px 0;
+    padding: 14px 18px;
+    background: #e8f0f8;
+    border-left: 5px solid #4a7c9b;
+    border-radius: 4px;
+    color: #3a4150;
+    font-style: italic;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.05);
+}
+
+blockquote p {
+    margin: 6px 0;
+    color: #3a4150;
+}
+
+/* 列表 */
+ul, ol {
+    margin: 12px 0;
+    padding-left: 28px;
+}
+
+li {
+    margin: 6px 0;
+    line-height: 1.75;
+    color: #3a4150;
+}
+
+ul li {
+    list-style-type: disc;
+}
+
+/* 代码 */
+code {
+    background: #e8f0f8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 14px;
+    color: #e74c3c;
+}
+
+pre {
+    background: #2c3e50;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+pre code {
+    background: transparent;
+    color: #4a7c9b;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* 表格 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 15px;
+}
+
+th {
+    background: #4a7c9b;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #e8e8e8;
+    color: #3a4150;
+}
+
+tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* 分割线 - 隐藏 */
+hr {
+    display: none;
+}
+
+/* 图片 */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 16px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .wechat-content {
+        padding: 20px 12px;
+    }
+
+    .content-card {
+        padding: 24px 16px;
+        border-radius: 8px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    pre {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="wechat-content">
+        <div class="content-card">
+<h1 id="20260304">财经速递 | 20260304</h1>
+<div class="editor-note-card"><h2 class="editor-note-title" id="_1">📝 编者按</h2><p class="editor-note-content">中东战火搅动全球市场，避险情绪急剧升温。油价飙升与通胀担忧联手，给股市泼了一盆冷水，A股“三桶油”逆势狂欢成为今日独特风景。</p></div>
+
+<hr/>
+<h2 id="_2">一、📰 新闻速递</h2>
+<h3 id="_3">🇨🇳 国内要闻</h3>
+<p>🛢️ <strong>油气、航运板块掀涨停潮</strong><br/>
+受中东局势紧张影响，国际油价大幅上涨，直接刺激A股油气、港口航运板块逆市走强，“三桶油”等多只股票涨停，成为弱市中一抹亮色。</p>
+<p>📉 <strong>A股三大指数集体回调</strong><br/>
+市场整体情绪偏谨慎，三大指数收跌，超4800只个股下跌，成交额维持高位。军工、有色金属、半导体等板块成为调整重灾区。</p>
+<p>⏰ <strong>A股或考虑延长交易时间</strong><br/>
+有建议提出延长A股交易时间以提升国际竞争力，反映出市场对增强流动性和吸引力的关注。</p>
+<h3 id="_4">🌍 国际动态</h3>
+<p>⚔️ <strong>中东冲突持续升级</strong><br/>
+以色列对伊朗发动空袭，伊朗威胁切断霍尔木兹海峡。美国宣布将为油轮提供海军护航及政治风险保险，国会拟就对伊动武进行表决，地缘政治风险急剧攀升。</p>
+<p>🛢️ <strong>油价应声大涨</strong><br/>
+受中东局势直接影响，国际原油价格大幅上涨，布伦特原油突破85美元/桶，欧洲天然气价格一度暴涨超50%，引发全球通胀担忧。</p>
+<p>💸 <strong>美联储降息预期生变</strong><br/>
+油价上涨带来的通胀压力，令市场对美联储年内降息的概率预期下降，短期债券收益率上升，美元指数创下阶段性新高。</p>
+<hr/>
+<h2 id="_5">二、📊 股市表现</h2>
+<h3 id="a">A股市场</h3>
+<p><strong>指数表现：</strong><br/>
+今日A股市场高开低走，最终集体收跌。上证指数下跌1.43%，深证成指下跌3.07%，创业板指下跌2.57%。盘中沪指虽一度刷新逾十年新高，但未能守住。</p>
+<p><strong>热门板块：</strong><br/>
+🔥 <strong>逆势上涨</strong>：油气开采、港口航运、煤炭、银行、保险板块表现强势，尤其是油气板块出现大面积涨停。<br/>
+📉 <strong>领跌板块</strong>：军工、有色金属、存储芯片、稀土永磁、半导体、化工等板块深度回调。</p>
+<p><strong>市场情绪：</strong><br/>
+市场情绪整体偏谨慎，超过4800只个股下跌。尽管指数调整，但两市成交额连续突破3万亿元，显示市场交投依然活跃，资金在板块间剧烈切换。</p>
+<h3 id="_6">美股市场</h3>
+<p><strong>指数表现：</strong><br/>
+美股全线重挫，三大指数集体收跌。道琼斯指数跌0.83%，纳斯达克指数跌1.02%，标普500指数跌0.94%。盘中波动剧烈，道指一度暴跌超1200点。</p>
+<p><strong>板块与个股：</strong><br/>
+科技股普遍走软，费城半导体指数大跌，英特尔等芯片股跌幅显著。能源股因油价上涨表现相对强劲。中概股亦承压，纳斯达克中国金龙指数大幅下跌。</p>
+<h3 id="_7">全球市场</h3>
+<p>🌍 <strong>欧洲股市</strong>：遭遇重挫，德国、法国等多国主要指数跌超3%，创下数月来最大两日跌幅。<br/>
+🌏 <strong>亚太股市</strong>：日韩股市暴跌，韩国综合指数一度触发熔断，日经225指数也大幅下挫。<br/>
+📈 <strong>恐慌指数</strong>：VIX恐慌指数飙升超30%，反映全球投资者避险情绪急剧升温。</p>
+<hr/>
+<h2 id="_8">三、🔮 市场展望</h2>
+<p><strong>地缘政治仍是短期主导因素</strong><br/>
+市场走势与中东局势高度绑定。冲突的任何升级或缓和信号，都将直接冲击油价，并通过通胀预期和供应链担忧传导至全球股市。投资者需密切关注霍尔木兹海峡的通航情况及相关大国表态。</p>
+<p><strong>“通胀-利率”逻辑链面临考验</strong><br/>
+油价飙升正在重塑市场对主要央行货币政策路径的预期。美联储降息概率下降，美元走强，对全球资产价格构成压力。后续需关注美国通胀数据及美联储官员的言论，以判断政策风向是否真的转变。</p>
+<p><strong>市场风格或持续分化</strong><br/>
+能源危机和避险需求可能继续支撑油气、航运等直接受益板块，而对利率敏感的高估值科技股、以及受经济放缓预期影响的顺周期板块可能持续承压。A股市场内部“冰火两重天”的结构性行情或将延续。</p>
+<p><strong>警惕波动率放大风险</strong><br/>
+VIX指数飙升预示市场已进入高波动阶段。无论是股市、债市还是大宗商品，价格的日内波动都可能加剧。投资者应管理好仓位，避免在情绪驱动下进行追涨杀跌。</p>
+<hr/>
+<p class="disclaimer-text">本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。<br/>
+关注我们，获取更多财经资讯。</p>
+        </div>
+    </div>
+</body>
+</html>

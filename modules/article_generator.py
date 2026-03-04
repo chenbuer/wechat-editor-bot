@@ -31,6 +31,9 @@ class ArticleGenerator:
         self.min_length = config.get('min_length', 800)
         self.max_length = config.get('max_length', 1500)
         self.include_summary = config.get('include_summary', True)
+
+        # 支持新的时段标题格式配置
+        self.title_formats = config.get('title_formats', {})
         self.title_format = config.get('title_format', '不大早的财经早报 | {date}')
 
         # 设置默认值
@@ -158,9 +161,31 @@ class ArticleGenerator:
         return content
 
     def _format_title(self, date_str: str) -> str:
-        """格式化文章标题"""
+        """格式化文章标题，根据当前时间选择合适的标题格式"""
         date_formatted = datetime.strptime(date_str, '%Y%m%d').strftime('%Y年%m月%d日')
-        return self.title_format.replace('{date}', date_str).replace('{date_formatted}', date_formatted)
+
+        # 如果配置了时段标题格式，根据当前时间选择
+        if self.title_formats:
+            title_format = self._get_title_format_by_time()
+        else:
+            title_format = self.title_format
+
+        return title_format.replace('{date}', date_str).replace('{date_formatted}', date_formatted)
+
+    def _get_title_format_by_time(self) -> str:
+        """根据当前时间获取对应的标题格式"""
+        now = datetime.now()
+        hour = now.hour
+
+        # 早晨: 2:00-10:00
+        if 2 <= hour < 10:
+            return self.title_formats.get('morning', self.title_format)
+        # 白天: 10:00-17:00
+        elif 10 <= hour < 17:
+            return self.title_formats.get('afternoon', self.title_format)
+        # 晚上: 17:00-2:00
+        else:
+            return self.title_formats.get('evening', self.title_format)
 
     def _get_mock_article_template(self, date_str: str) -> str:
         """获取 Mock 文章模板"""
@@ -264,9 +289,16 @@ class ArticleGenerator:
 
     def _get_prompt_template(self, date_formatted: str, news_list: str, title: str, date_str: str) -> str:
         """获取 AI 提示词模板"""
-        return f"""你是一位资深财经记者，擅长撰写生动有趣的财经早报。
+        # 根据标题判断文章类型
+        article_type = "财经早报"
+        if "速递" in title:
+            article_type = "财经速递"
+        elif "日报" in title:
+            article_type = "财经日报"
 
-今天是 {date_formatted}，请根据以下财经新闻，撰写一篇财经早报。
+        return f"""你是一位资深财经记者，擅长撰写生动有趣的{article_type}。
+
+今天是 {date_formatted}，请根据以下财经新闻，撰写一篇{article_type}。
 
 **新闻素材：**
 {news_list}

@@ -199,13 +199,18 @@ wechat:
 - `WECHAT_APPID` - 微信公众号 AppID
 - `WECHAT_SECRET` - 微信公众号 Secret
 
+**定时任务：** 每天北京时间 07:00 自动运行，根据触发时间生成不同类型的文章：
+- 早晨 (2:00-10:00)：生成"不大早的财经早报"
+- 白天 (10:00-17:00)：生成"财经速递"
+- 晚上 (17:00-2:00)：生成"财经日报"
+
 ### 方式 2：本地 Cron
 
 ```bash
 crontab -e
 
-# 每天 8:00 运行
-0 8 * * * cd /path/to/auto-wechat && uv run python finance_news_bot.py >> logs/cron.log 2>&1
+# 每天 7:00 运行
+0 7 * * * cd /path/to/auto-wechat && uv run python finance_news_bot.py >> logs/cron.log 2>&1
 ```
 
 ## 💰 成本估算
