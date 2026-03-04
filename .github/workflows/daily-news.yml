@@ -64,7 +64,7 @@ jobs:
         TZ: 'Asia/Shanghai'
 
     - name: Upload generated articles
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: news-articles-${{ github.run_number }}
@@ -74,7 +74,7 @@ jobs:
         retention-days: 30
 
     - name: Upload generated images
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: news-images-${{ github.run_number }}
@@ -82,7 +82,7 @@ jobs:
         retention-days: 30
 
     - name: Upload logs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: logs-${{ github.run_number }}
