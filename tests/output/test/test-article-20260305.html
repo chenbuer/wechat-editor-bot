@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test-article-20260305</title>
+    <style>
+
+/* 主容器 */
+.wechat-content {
+    background-color: #f0f4f8;
+    padding: 40px 16px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #3a4150;
+    letter-spacing: 0.2px;
+}
+
+/* 内容卡片 */
+.content-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    background-image: linear-gradient(rgba(74, 124, 155, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 124, 155, 0.03) 1px, transparent 1px); background-size: 24px 24px;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(58, 65, 80, 0.06), 0 0 16px rgba(74, 124, 155, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 标题样式 */
+h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: #3d6a8a;
+    margin: 20px 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #4a7c9b;
+    line-height: 1.4;
+}
+
+/* 大章节标题 - 带背景色 */
+h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #4a7c9b;
+    margin: 24px 0 3px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #e8f0f8 0%, rgba(255,255,255,0.5) 100%);
+    border-bottom: 2px solid #4a7c9b;
+    # border-radius: 6px;
+    line-height: 1.4;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 编者按标题不应用通用 h2 样式 */
+.editor-note-card h2 {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 14px 20px 10px 20px;
+    margin: 0;
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #3d6a8a;
+    margin: 16px 0 10px;
+    line-height: 1.4;
+    display: inline-block;
+    padding-bottom: 4px;
+    font-style: italic;
+}
+
+h4, h5, h6 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #3d6a8a;
+    margin: 14px 0 10px;
+    line-height: 1.4;
+}
+
+/* 段落 */
+p {
+    margin: 3px 0;
+    text-align: justify;
+    color: #3a4150;
+    line-height: 1.75;
+}
+
+/* 编者按卡片容器 */
+.editor-note-card {
+    margin: 20px 0;
+    border-left: 4px solid #4a7c9b;
+    overflow: hidden;
+}
+
+/* 编者按标题 */
+.editor-note-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #3a4150;
+    margin: 0;
+    padding: 14px 20px 10px 20px;
+    line-height: 1.4;
+}
+
+/* 编者按内容 */
+.editor-note-content {
+    margin: 0;
+    padding: 0 20px 14px 20px;
+    text-align: justify;
+    color: #555;
+    line-height: 1.75;
+    font-style: italic;
+    font-size: 15px;
+}
+
+/* 免责声明 - 小字提示 */
+.disclaimer-text {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 30px 0 20px;
+    padding: 0 20px;
+}
+
+/* 强调 */
+strong {
+    color: #3d6a8a;
+    font-weight: 500;
+}
+
+em {
+    color: #4a7c9b;
+    font-style: italic;
+}
+
+/* 链接 */
+a {
+    color: #4a7c9b;
+    text-decoration: none;
+    border-bottom: 1px solid #4a7c9b;
+    transition: all 0.3s;
+}
+
+a:hover {
+    color: #3d6a8a;
+    border-bottom-color: #3d6a8a;
+}
+
+/* 引用块 */
+blockquote {
+    margin: 16px 0;
+    padding: 14px 18px;
+    background: #e8f0f8;
+    border-left: 6px solid #4a7c9b;
+    border-radius: 4px;
+    color: #3a4150;
+    font-style: italic;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.05);
+}
+
+blockquote p {
+    margin: 6px 0;
+    color: #3a4150;
+}
+
+/* 列表 */
+ul, ol {
+    margin: 12px 0;
+    padding-left: 28px;
+}
+
+li {
+    margin: 6px 0;
+    line-height: 1.75;
+    color: #3a4150;
+}
+
+ul li {
+    list-style-type: disc;
+}
+
+/* 代码 */
+code {
+    background: #e8f0f8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 14px;
+    color: #e74c3c;
+}
+
+pre {
+    background: #2c3e50;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+pre code {
+    background: transparent;
+    color: #4a7c9b;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* 表格 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 15px;
+}
+
+th {
+    background: #4a7c9b;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #e8e8e8;
+    color: #3a4150;
+}
+
+tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* 分割线 - 隐藏 */
+hr {
+    display: none;
+}
+
+/* 图片 */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 16px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .wechat-content {
+        padding: 20px 12px;
+    }
+
+    .content-card {
+        padding: 24px 16px;
+        border-radius: 8px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    pre {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="wechat-content">
+        <div class="content-card">
+<h1 id="20260305">财经速递 | 20260305</h1>
+<div class="editor-note-card"><h2 class="editor-note-title" id="_1">📝 编者按</h2><p class="editor-note-content">市场情绪在波动中回暖！美股科技股领衔反弹，为全球市场注入暖意。然而，地缘政治与贸易政策阴云未散，投资者在乐观中仍需系好安全带。</p></div>
+
+<hr/>
+<h2 id="_2">一、新闻速递</h2>
+<h3 id="_3">🇨🇳 国内要闻</h3>
+<ol>
+<li>
+<p><strong>富时A50指数大换血</strong><br/>
+    富时中国A50指数调整生效，纳入中国船舶、天孚通信、万华化学等股，同时剔除部分银行股，反映中国经济结构的调整方向。</p>
+</li>
+<li>
+<p><strong>期货市场交易活跃</strong><br/>
+    2026年2月全国期货市场成交量达5.03亿手，成交额同比增长7.82%，1-2月累计成交量同比增近27%，显示市场活跃度持续提升。</p>
+</li>
+<li>
+<p><strong>监管高压态势延续</strong><br/>
+    证监会已对多家上市公司展开调查，强化信息披露监管，彰显维护市场秩序的坚定决心。</p>
+</li>
+</ol>
+<h3 id="_4">🌍 国际动态</h3>
+<ol>
+<li>
+<p><strong>美国全球关税本周生效</strong><br/>
+    美国财长宣布，特朗普政府对全球进口商品征收15%关税的措施预计本周生效，此举可能对全球供应链和市场情绪产生影响。</p>
+</li>
+<li>
+<p><strong>普京考虑对欧“断气”</strong><br/>
+    俄罗斯总统普京表示考虑主动停止向欧洲供应天然气，以回应欧盟逐步禁止俄气进口的措施，俄欧能源关系持续紧张。</p>
+</li>
+<li>
+<p><strong>美国“小非农”超预期</strong><br/>
+    美国2月ADP私营部门就业人数增加6.3万，超出预期，显示劳动力市场有趋稳迹象，为美联储政策提供参考。</p>
+</li>
+</ol>
+<hr/>
+<h2 id="_5">二、市场表现</h2>
+<h3 id="a">🏦 A股市场</h3>
+<p><strong>指数震荡调整，能源板块逆势坚挺。</strong> 受前一日外围市场影响，A股主要指数出现调整，上证指数失守4100点。然而，市场并非全无亮点，受中东局势推动国际油价上涨影响，油气板块表现突出，“三桶油”股价创下阶段新高。同时，电网设备等板块也展现出避风港特性。整体市场情绪短期受外部冲击，但机构普遍认为中长期向好趋势未变。</p>
+<h3 id="_6">🦀 美股市场</h3>
+<p><strong>科技股强力“回血”，三大指数集体收高。</strong> 美股在经历波动后显著反弹，纳斯达克指数涨幅领先。科技股成为反弹先锋，英伟达、特斯拉、亚马逊等巨头涨幅显著，芯片股表现尤为亮眼，美光科技、AMD等涨超5%。积极的经济数据（如“小非农”）和部分公司财报利好（如博通）提振了市场信心。</p>
+<h3 id="_7">🐂 全球市场</h3>
+<p><strong>港股跟随反弹，台股夜盘狂飙。</strong> 受美股回暖提振，港股三大指数集体高开，科技股与汽车股普涨。台股市场方面，随着美股止跌及中东局势出现缓和迹象，台指夜盘大幅上涨，市场预计开盘将止跌反弹。全球市场情绪在地缘政治担忧与积极经济信号之间摇摆。</p>
+<hr/>
+<h2 id="_8">三、市场展望</h2>
+<p>市场在多重因素拉扯下展现出韧性，但前方道路仍布满需要警惕的“路标”。</p>
+<ol>
+<li>
+<p><strong>关键博弈点：地缘与政策</strong><br/>
+<strong>中东局势</strong>的任何反复都将直接冲击能源价格和全球通胀预期，是市场短期波动的核心变量。同时，<strong>美国即将生效的全球关税政策</strong>如同悬在市场头上的“达摩克利斯之剑”，其对全球贸易和经济增长的潜在影响不容忽视。</p>
+</li>
+<li>
+<p><strong>核心支撑力：科技与数据</strong><br/>
+<strong>人工智能（AI）等科技主线</strong>的强劲表现，显示了产业趋势对市场的强大牵引力。另一方面，像美国“小非农”这样的<strong>经济数据</strong>若持续稳健，将有助于平复对经济衰退的担忧，为市场提供基本面支撑。</p>
+</li>
+<li>
+<p><strong>投资者备忘：在波动中寻找确定性</strong><br/>
+    在宏观不确定性较高的环境下，资金可能继续在<strong>避险资产（如债市、黄金）</strong> 与<strong>高景气赛道（如科技、能源）</strong> 之间快速轮动。建议投资者避免追涨杀跌，关注有真实业绩支撑和受产业政策驱动的板块，同时密切关注美联储政策动向及主要经济体的宏观政策调整。</p>
+</li>
+</ol>
+<hr/>
+<p class="disclaimer-text">本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。<br/>
+关注我们，获取更多财经资讯。</p>
+        </div>
+    </div>
+</body>
+</html>
