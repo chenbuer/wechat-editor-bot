@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Markdown 转微信公众号 HTML 转换器
-支持多主题：清新绿色、深海静谧
+支持多主题：清新绿色、深海静谧、热情似火
 适配电脑端和手机端
 
 从 md2wechat.py 移动到 modules 目录
@@ -21,14 +21,14 @@ from pathlib import Path
 # 清新主题（绿色调）
 WARM_THEME = {
     'name': '热情红色',
-    'mood': '热情似火',
+    'mood': '沉稳热情',
     'colors': '红色色调',
-    'best_for': '热爱生活、充满热情',
-    'background': '#f8faf8',
-    'text': '#3a3a3a',
-    'primary': '#5f0101',
-    'secondary': '#c4332c',
-    'caption_background': '#f0f9f4',
+    'best_for': '长篇文章、热爱生活的文字',
+    'background': '#fff6f5',        # 柔和暖白背景
+    'text': '#3a3a3a',              # 深棕红文字，舒适可读
+    'primary': '#3d1f1f',           # 沉稳红色，一级标题及边框
+    'secondary': '#8b1e1e',         # 次级红色，大标题、强调文字
+    'caption_background': "#fffbfa", # 内容块背景，微妙区分
 }
 
 # 清新主题（绿色调）
@@ -40,7 +40,7 @@ FRESH_THEME = {
     'background': '#f8faf8',
     'text': '#3a3a3a',
     'primary': '#42b983',
-    'secondary': '#35a372',
+    'secondary': '#333',
     'caption_background': '#f0f9f4',
 }
 
@@ -143,9 +143,9 @@ h2 {{
 }}
 
 h3 {{
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 800;
-    color: {theme['secondary']};
+    color: {theme['primary']};
     margin: 16px 0 10px;
     line-height: 1.4;
     display: inline-block;
