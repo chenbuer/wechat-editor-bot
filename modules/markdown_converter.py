@@ -28,7 +28,7 @@ FRESH_THEME = {
     'text': '#3a3a3a',
     'primary': '#42b983',
     'secondary': '#35a372',
-    'quote_background': '#f0f9f4',
+    'caption_background': '#f0f9f4',
 }
 
 # 深海静谧主题（蓝色调）
@@ -41,7 +41,7 @@ OCEAN_THEME = {
     'text': '#3a4150',
     'primary': '#4a7c9b',
     'secondary': '#3d6a8a',
-    'quote_background': '#e8f0f8',
+    'caption_background': '#e8f0f8',
 }
 
 THEMES = {
@@ -109,11 +109,11 @@ h2 {{
     font-size: 22px;
     font-weight: 600;
     color: {theme['primary']};
-    margin: 20px 0 12px;
+    margin: 24px 0 3px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, {theme['quote_background']} 0%, rgba(255,255,255,0.5) 100%);
-    border-left: 4px solid {theme['primary']};
-    border-radius: 6px;
+    background: linear-gradient(135deg, {theme['caption_background']} 0%, rgba(255,255,255,0.5) 100%);
+    border-bottom: 2px solid {theme['primary']};
+    # border-radius: 6px;
     line-height: 1.4;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }}
@@ -130,13 +130,13 @@ h2 {{
 
 h3 {{
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 800;
     color: {theme['secondary']};
     margin: 16px 0 10px;
     line-height: 1.4;
     display: inline-block;
-    border-bottom: 2px solid {theme['primary']};
     padding-bottom: 4px;
+    font-style: italic;
 }}
 
 h4, h5, h6 {{
@@ -149,7 +149,7 @@ h4, h5, h6 {{
 
 /* 段落 */
 p {{
-    margin: 12px 0;
+    margin: 3px 0;
     text-align: justify;
     color: {theme['text']};
     line-height: 1.75;
@@ -158,11 +158,7 @@ p {{
 /* 编者按卡片容器 */
 .editor-note-card {{
     margin: 20px 0;
-    background: linear-gradient(135deg, {theme['quote_background']} 0%, #fff 100%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
     border-left: 4px solid {theme['primary']};
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     overflow: hidden;
 }}
 
@@ -170,7 +166,7 @@ p {{
 .editor-note-title {{
     font-size: 20px;
     font-weight: 600;
-    color: {theme['primary']};
+    color: {theme['text']};
     margin: 0;
     padding: 14px 20px 10px 20px;
     line-height: 1.4;
@@ -200,7 +196,7 @@ p {{
 /* 强调 */
 strong {{
     color: {theme['secondary']};
-    font-weight: 600;
+    font-weight: 500;
 }}
 
 em {{
@@ -225,8 +221,8 @@ a:hover {{
 blockquote {{
     margin: 16px 0;
     padding: 14px 18px;
-    background: {theme['quote_background']};
-    border-left: 5px solid {theme['primary']};
+    background: {theme['caption_background']};
+    border-left: 6px solid {theme['primary']};
     border-radius: 4px;
     color: {theme['text']};
     font-style: italic;
@@ -256,7 +252,7 @@ ul li {{
 
 /* 代码 */
 code {{
-    background: {theme['quote_background']};
+    background: {theme['caption_background']};
     padding: 2px 6px;
     border-radius: 3px;
     font-family: 'Courier New', Consolas, monospace;

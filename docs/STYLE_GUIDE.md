@@ -70,7 +70,7 @@ wechat:
 /* 编者按卡片容器 */
 .editor-note-card {{
     margin: 20px 0;
-    background: linear-gradient(135deg, {theme['quote_background']} 0%, #fff 100%);
+    background: linear-gradient(135deg, {theme['caption_background']} 0%, #fff 100%);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-left: 4px solid {theme['primary']};
     border-radius: 8px;
@@ -107,7 +107,7 @@ h2 {{
     color: {theme['primary']};
     margin: 20px 0 12px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, {theme['quote_background']} 0%, rgba(255,255,255,0.5) 100%);
+    background: linear-gradient(135deg, {theme['caption_background']} 0%, rgba(255,255,255,0.5) 100%);
     border-left: 4px solid {theme['primary']};
     border-radius: 6px;
     line-height: 1.4;
