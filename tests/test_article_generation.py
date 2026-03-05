@@ -118,7 +118,7 @@ def main():
     article_html = convert_markdown_to_html(
         str(md_path),
         output_file=str(html_path),
-        theme='ocean'
+        theme='warm'
     )
     logger.info(f"✅ HTML 已保存: {html_path}")
 

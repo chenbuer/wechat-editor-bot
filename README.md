@@ -174,7 +174,7 @@ weather:
 wechat:
   create_draft: true
   auto_publish: false  # 强烈建议保持 false，人工审核后发布
-  theme: "ocean"  # 主题：ocean（深海静谧）或 fresh（清新绿色）
+  theme: "ocean"  # 主题：ocean（深海静谧）或 fresh（清新绿色）或 warm(热情似火)
 ```
 
 ## 🎨 文章样式特性

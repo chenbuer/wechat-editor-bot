@@ -19,6 +19,19 @@ from pathlib import Path
 # ============================================================================
 
 # 清新主题（绿色调）
+WARM_THEME = {
+    'name': '热情红色',
+    'mood': '热情似火',
+    'colors': '红色色调',
+    'best_for': '热爱生活、充满热情',
+    'background': '#f8faf8',
+    'text': '#3a3a3a',
+    'primary': '#5f0101',
+    'secondary': '#c4332c',
+    'caption_background': '#f0f9f4',
+}
+
+# 清新主题（绿色调）
 FRESH_THEME = {
     'name': '清新绿色',
     'mood': '清新自然',
@@ -47,6 +60,7 @@ OCEAN_THEME = {
 THEMES = {
     'fresh': FRESH_THEME,
     'ocean': OCEAN_THEME,
+    'warm': WARM_THEME,
 }
 
 
@@ -364,7 +378,7 @@ def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme=
         markdown_file: Markdown 文件路径
         output_file: 输出 HTML 文件路径（可选）
         title: HTML 标题（可选，默认使用文件名）
-        theme: 主题名称 (fresh/ocean)
+        theme: 主题名称 (fresh/ocean/warm)
 
     Returns:
         生成的 HTML 内容
@@ -482,6 +496,7 @@ def main():
 主题说明：
   fresh  - 清新绿色主题（适合生活随笔、自然主题）
   ocean  - 深海静谧主题（适合技术文章、商业分析）
+  warm   - 热情似火主题
 
 示例：
   python md2wechat.py article.md
@@ -493,7 +508,7 @@ def main():
 
     parser.add_argument('input', help='输入的 Markdown 文件')
     parser.add_argument('-o', '--output', help='输出的 HTML 文件（默认：输入文件名.html）')
-    parser.add_argument('-t', '--theme', choices=['fresh', 'ocean'], default='fresh',
+    parser.add_argument('-t', '--theme', choices=['fresh', 'ocean', 'warm'], default='fresh',
                         help='主题选择（默认：fresh）')
     parser.add_argument('--title', help='HTML 标题（默认：文件名）')
 

@@ -129,7 +129,7 @@ weather:
 wechat:
   auto_publish: false        # 安全起见：仅创建草稿，不自动发布
   create_draft: true         # 创建草稿
-  theme: "ocean"             # HTML 主题：fresh, ocean
+  theme: "ocean"             # HTML 主题：fresh, ocean, warm
   author: "财经日报"          # 文章作者
   enable_comment: false      # 是否开启评论
   only_fans_comment: false   # 是否仅粉丝可评论

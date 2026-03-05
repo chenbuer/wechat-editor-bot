@@ -8,13 +8,13 @@
 
 /* 主容器 */
 .wechat-content {
-    background-color: #f0f4f8;
+    background-color: #f8faf8;
     padding: 40px 16px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 16px;
     line-height: 1.8;
-    color: #3a4150;
-    letter-spacing: 0.2px;
+    color: #3a3a3a;
+    letter-spacing: 0.5px;
 }
 
 /* 内容卡片 */
@@ -22,10 +22,10 @@
     max-width: 800px;
     margin: 0 auto;
     background: #ffffff;
-    background-image: linear-gradient(rgba(74, 124, 155, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 124, 155, 0.03) 1px, transparent 1px); background-size: 24px 24px;
+    
     padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 8px 28px rgba(58, 65, 80, 0.06), 0 0 16px rgba(74, 124, 155, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -33,10 +33,10 @@
 h1 {
     font-size: 28px;
     font-weight: 600;
-    color: #3d6a8a;
+    color: #35a372;
     margin: 20px 0 12px;
     padding-bottom: 10px;
-    border-bottom: 3px solid #4a7c9b;
+    border-bottom: 3px solid #42b983;
     line-height: 1.4;
 }
 
@@ -44,11 +44,11 @@ h1 {
 h2 {
     font-size: 22px;
     font-weight: 600;
-    color: #4a7c9b;
+    color: #42b983;
     margin: 24px 0 3px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, #e8f0f8 0%, rgba(255,255,255,0.5) 100%);
-    border-bottom: 2px solid #4a7c9b;
+    background: linear-gradient(135deg, #f0f9f4 0%, rgba(255,255,255,0.5) 100%);
+    border-bottom: 2px solid #42b983;
     # border-radius: 6px;
     line-height: 1.4;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -67,7 +67,7 @@ h2 {
 h3 {
     font-size: 18px;
     font-weight: 800;
-    color: #3d6a8a;
+    color: #35a372;
     margin: 16px 0 10px;
     line-height: 1.4;
     display: inline-block;
@@ -78,7 +78,7 @@ h3 {
 h4, h5, h6 {
     font-size: 17px;
     font-weight: 600;
-    color: #3d6a8a;
+    color: #35a372;
     margin: 14px 0 10px;
     line-height: 1.4;
 }
@@ -87,14 +87,14 @@ h4, h5, h6 {
 p {
     margin: 3px 0;
     text-align: justify;
-    color: #3a4150;
+    color: #3a3a3a;
     line-height: 1.75;
 }
 
 /* 编者按卡片容器 */
 .editor-note-card {
     margin: 20px 0;
-    border-left: 4px solid #4a7c9b;
+    border-left: 4px solid #42b983;
     overflow: hidden;
 }
 
@@ -102,7 +102,7 @@ p {
 .editor-note-title {
     font-size: 20px;
     font-weight: 600;
-    color: #3a4150;
+    color: #3a3a3a;
     margin: 0;
     padding: 14px 20px 10px 20px;
     line-height: 1.4;
@@ -131,43 +131,43 @@ p {
 
 /* 强调 */
 strong {
-    color: #3d6a8a;
+    color: #35a372;
     font-weight: 500;
 }
 
 em {
-    color: #4a7c9b;
+    color: #42b983;
     font-style: italic;
 }
 
 /* 链接 */
 a {
-    color: #4a7c9b;
+    color: #42b983;
     text-decoration: none;
-    border-bottom: 1px solid #4a7c9b;
+    border-bottom: 1px solid #42b983;
     transition: all 0.3s;
 }
 
 a:hover {
-    color: #3d6a8a;
-    border-bottom-color: #3d6a8a;
+    color: #35a372;
+    border-bottom-color: #35a372;
 }
 
 /* 引用块 */
 blockquote {
     margin: 16px 0;
     padding: 14px 18px;
-    background: #e8f0f8;
-    border-left: 6px solid #4a7c9b;
+    background: #f0f9f4;
+    border-left: 6px solid #42b983;
     border-radius: 4px;
-    color: #3a4150;
+    color: #3a3a3a;
     font-style: italic;
     box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.05);
 }
 
 blockquote p {
     margin: 6px 0;
-    color: #3a4150;
+    color: #3a3a3a;
 }
 
 /* 列表 */
@@ -179,7 +179,7 @@ ul, ol {
 li {
     margin: 6px 0;
     line-height: 1.75;
-    color: #3a4150;
+    color: #3a3a3a;
 }
 
 ul li {
@@ -188,7 +188,7 @@ ul li {
 
 /* 代码 */
 code {
-    background: #e8f0f8;
+    background: #f0f9f4;
     padding: 2px 6px;
     border-radius: 3px;
     font-family: 'Courier New', Consolas, monospace;
@@ -206,7 +206,7 @@ pre {
 
 pre code {
     background: transparent;
-    color: #4a7c9b;
+    color: #42b983;
     padding: 0;
     font-size: 14px;
     line-height: 1.6;
@@ -221,7 +221,7 @@ table {
 }
 
 th {
-    background: #4a7c9b;
+    background: #42b983;
     color: white;
     padding: 12px;
     text-align: left;
@@ -231,7 +231,7 @@ th {
 td {
     padding: 12px;
     border-bottom: 1px solid #e8e8e8;
-    color: #3a4150;
+    color: #3a3a3a;
 }
 
 tr:nth-child(even) {
@@ -295,66 +295,43 @@ img {
 <body>
     <div class="wechat-content">
         <div class="content-card">
-<h1 id="20260305">财经速递 | 20260305</h1>
-<div class="editor-note-card"><h2 class="editor-note-title" id="_1">📝 编者按</h2><p class="editor-note-content">市场情绪在波动中回暖！美股科技股领衔反弹，为全球市场注入暖意。然而，地缘政治与贸易政策阴云未散，投资者在乐观中仍需系好安全带。</p></div>
+<h1 id="20260305">财经日报 | 20260305</h1>
+<div class="editor-note-card"><h2 class="editor-note-title" id="_1">📝 编者按</h2><p class="editor-note-content">今日市场情绪在动荡中寻找平衡，美股科技股强劲反弹带动全球风险偏好回升。然而，地缘政治紧张与贸易政策变数仍如影随形，投资者需在乐观中保持一份清醒。</p></div>
 
 <hr/>
 <h2 id="_2">一、新闻速递</h2>
 <h3 id="_3">🇨🇳 国内要闻</h3>
-<ol>
-<li>
-<p><strong>富时A50指数大换血</strong><br/>
-    富时中国A50指数调整生效，纳入中国船舶、天孚通信、万华化学等股，同时剔除部分银行股，反映中国经济结构的调整方向。</p>
-</li>
-<li>
-<p><strong>期货市场交易活跃</strong><br/>
-    2026年2月全国期货市场成交量达5.03亿手，成交额同比增长7.82%，1-2月累计成交量同比增近27%，显示市场活跃度持续提升。</p>
-</li>
-<li>
-<p><strong>监管高压态势延续</strong><br/>
-    证监会已对多家上市公司展开调查，强化信息披露监管，彰显维护市场秩序的坚定决心。</p>
-</li>
-</ol>
+<ul>
+<li><strong>富时A50指数调整生效，反映经济结构变化</strong>：富时中国A50指数最新调整，纳入中国船舶、天孚通信、万华化学等多股，同时剔除部分银行股。</li>
+<li><strong>期货市场交易活跃，广州所表现亮眼</strong>：2026年2月全国期货市场成交量为5.03亿手，成交额同比增长7.82%。其中广州期货交易所成交量大幅增长81.13%。</li>
+<li><strong>监管高压态势持续，多家公司被立案调查</strong>：证监会已对多家上市公司展开调查，强化信息披露监管，彰显监管力度。</li>
+<li><strong>上半年GDP增长稳健，消费成主力</strong>：2025年上半年中国GDP达66.05万亿元，同比增长5.3%，消费对经济增长的贡献率超过一半。</li>
+</ul>
 <h3 id="_4">🌍 国际动态</h3>
-<ol>
-<li>
-<p><strong>美国全球关税本周生效</strong><br/>
-    美国财长宣布，特朗普政府对全球进口商品征收15%关税的措施预计本周生效，此举可能对全球供应链和市场情绪产生影响。</p>
-</li>
-<li>
-<p><strong>普京考虑对欧“断气”</strong><br/>
-    俄罗斯总统普京表示考虑主动停止向欧洲供应天然气，以回应欧盟逐步禁止俄气进口的措施，俄欧能源关系持续紧张。</p>
-</li>
-<li>
-<p><strong>美国“小非农”超预期</strong><br/>
-    美国2月ADP私营部门就业人数增加6.3万，超出预期，显示劳动力市场有趋稳迹象，为美联储政策提供参考。</p>
-</li>
-</ol>
+<ul>
+<li><strong>美国对全球15%关税本周或将生效</strong>：美国财政部长宣布，特朗普政府决定对全球进口商品征收15%关税的措施预计本周正式生效。</li>
+<li><strong>普京考虑对欧洲“主动断气”</strong>：作为对欧盟逐步禁止俄气进口措施的回应，普京表示考虑主动停止向欧洲供应天然气，俄欧能源关系紧张。</li>
+<li><strong>美国“小非农”就业数据超预期</strong>：美国ADP就业数据显示，2月私营部门就业增加6.3万，超出预期，显示劳动力市场趋稳迹象。</li>
+<li><strong>特朗普召集军工巨头，暗示军事行动升级</strong>：美国前总统特朗普计划召集军工巨头加快军火生产，同时美国防长宣称放弃交战规则，引发关注。</li>
+</ul>
 <hr/>
 <h2 id="_5">二、市场表现</h2>
 <h3 id="a">🏦 A股市场</h3>
-<p><strong>指数震荡调整，能源板块逆势坚挺。</strong> 受前一日外围市场影响，A股主要指数出现调整，上证指数失守4100点。然而，市场并非全无亮点，受中东局势推动国际油价上涨影响，油气板块表现突出，“三桶油”股价创下阶段新高。同时，电网设备等板块也展现出避风港特性。整体市场情绪短期受外部冲击，但机构普遍认为中长期向好趋势未变。</p>
+<p><strong>指数震荡调整，能源板块逆势坚挺</strong>。昨日A股市场出现明显调整，上证指数失守4100点。市场情绪受中东局势升级影响，但<strong>电网设备等板块逆势上涨</strong>，显示出避风港特性。今日早盘，A股三大指数集体高开，科技、半导体等板块表现活跃。值得注意的是，受国际油价飙升推动，油气股表现突出，“三桶油”股价创下多年新高。</p>
 <h3 id="_6">🦀 美股市场</h3>
-<p><strong>科技股强力“回血”，三大指数集体收高。</strong> 美股在经历波动后显著反弹，纳斯达克指数涨幅领先。科技股成为反弹先锋，英伟达、特斯拉、亚马逊等巨头涨幅显著，芯片股表现尤为亮眼，美光科技、AMD等涨超5%。积极的经济数据（如“小非农”）和部分公司财报利好（如博通）提振了市场信心。</p>
+<p><strong>科技股领衔反弹，市场情绪显著回暖</strong>。美股市场在经历波动后强劲反弹，三大指数集体收涨，纳斯达克指数涨幅领先。<strong>科技股成为反弹先锋</strong>，英伟达、特斯拉、亚马逊等涨幅显著，芯片股美光科技、AMD等涨超5%。积极的经济数据（如“小非农”）缓解了部分担忧，市场预期美联储3月将按兵不动。</p>
 <h3 id="_7">🐂 全球市场</h3>
-<p><strong>港股跟随反弹，台股夜盘狂飙。</strong> 受美股回暖提振，港股三大指数集体高开，科技股与汽车股普涨。台股市场方面，随着美股止跌及中东局势出现缓和迹象，台指夜盘大幅上涨，市场预计开盘将止跌反弹。全球市场情绪在地缘政治担忧与积极经济信号之间摇摆。</p>
+<p><strong>港股跟随外围反弹，台股夜盘狂飙</strong>。受美股反弹提振，港股三大指数今日集体高开，恒生科技指数涨幅居前，科技股与汽车股普涨。<strong>台股市场亦受鼓舞</strong>，在美股止跌反攻后，台指夜盘大幅上涨，市场预计今日开盘有望止跌反弹。欧洲主要股指也同步走强。</p>
 <hr/>
 <h2 id="_8">三、市场展望</h2>
-<p>市场在多重因素拉扯下展现出韧性，但前方道路仍布满需要警惕的“路标”。</p>
+<p><strong>短期情绪修复，但波动因子仍在</strong>。市场在超跌后迎来技术性反弹，尤其是对利率敏感的科技股表现抢眼。美国稳健的就业数据暂时安抚了神经，但展望后市，几大关键因素将主导市场方向：</p>
 <ol>
-<li>
-<p><strong>关键博弈点：地缘与政策</strong><br/>
-<strong>中东局势</strong>的任何反复都将直接冲击能源价格和全球通胀预期，是市场短期波动的核心变量。同时，<strong>美国即将生效的全球关税政策</strong>如同悬在市场头上的“达摩克利斯之剑”，其对全球贸易和经济增长的潜在影响不容忽视。</p>
-</li>
-<li>
-<p><strong>核心支撑力：科技与数据</strong><br/>
-<strong>人工智能（AI）等科技主线</strong>的强劲表现，显示了产业趋势对市场的强大牵引力。另一方面，像美国“小非农”这样的<strong>经济数据</strong>若持续稳健，将有助于平复对经济衰退的担忧，为市场提供基本面支撑。</p>
-</li>
-<li>
-<p><strong>投资者备忘：在波动中寻找确定性</strong><br/>
-    在宏观不确定性较高的环境下，资金可能继续在<strong>避险资产（如债市、黄金）</strong> 与<strong>高景气赛道（如科技、能源）</strong> 之间快速轮动。建议投资者避免追涨杀跌，关注有真实业绩支撑和受产业政策驱动的板块，同时密切关注美联储政策动向及主要经济体的宏观政策调整。</p>
-</li>
+<li><strong>地缘政治与能源价格</strong>：中东局势虽现缓和迹象，但俄欧能源博弈、美国对伊朗的强硬态度仍是悬在市场头上的“达摩克利斯之剑”，油价波动将持续影响通胀预期与市场风险偏好。</li>
+<li><strong>贸易政策冲击</strong>：<strong>美国拟实施的全球性15%关税若本周生效，将成为影响全球供应链和贸易情绪的重大变量</strong>，可能引发新一轮市场震荡。</li>
+<li><strong>政策与数据博弈</strong>：各国央行的货币政策路径（尤其是美联储）与经济数据的强弱对比，将是决定市场能否持续反弹的核心。投资者需密切关注后续的非农就业等关键数据。</li>
+<li><strong>板块结构性机会</strong>：在整体波动市中，<strong>AI算力、半导体、能源安全等板块</strong>因自身产业趋势或避险属性，可能继续呈现结构性行情。同时，中国债市在全球“股债齐崩”中凸显的避险属性也值得关注。</li>
 </ol>
+<p><strong>总体而言，市场正处于宏观事件密集驱动的阶段，建议投资者在参与反弹时保持警惕，均衡配置，避免过度追逐单一热点。</strong></p>
 <hr/>
 <p class="disclaimer-text">本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。<br/>
 关注我们，获取更多财经资讯。</p>
