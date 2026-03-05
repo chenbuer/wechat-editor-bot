@@ -8,6 +8,7 @@
 import logging
 import requests
 import os
+import random
 from typing import Dict
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
@@ -73,27 +74,56 @@ class ImageGenerator:
         condition = weather_data.get('condition', 'Clear').lower()
         time_of_day = weather_data.get('time_of_day', 'morning')
 
-        # 根据天气选择场景
+        # 场景列表（保持简短，多样化）
+        rain_scenes = [
+            "细雨中的江南水乡", "小桥流水，烟雨朦胧", "细雨霏霏的城市街道", "淅淅沥沥的窗外",
+            "雨中公园小径", "湿润的乡间小路", "雨幕中的河边", "蒙蒙细雨的街头",
+            "雨滴打在屋檐上", "薄雾下的街道"
+        ]
+        cloud_scenes = [
+            "云雾缭绕的山水画", "阴云密布的城市天际", "多云的森林小径", "灰白天空的海边",
+            "薄雾环绕的湖面", "多云的草原", "云层覆盖的山峰", "阴云笼罩的乡村",
+            "多云的河岸", "雾气弥漫的小路"
+        ]
+        snow_scenes = [
+            "雪后的宁静村庄", "白雪皑皑的平原", "枯树覆盖厚雪的公园", "雪地中的湖面",
+            "雪夜的街道", "山间雪林", "雪覆盖的山坡", "雪花飘落的村庄",
+            "冰冻的小溪", "雪覆盖的田野"
+        ]
+        sunny_scenes = [
+            "阳光明媚的田园风光", "金色麦田", "蓝天白云的广阔草原", "阳光下的海滩",
+            "阳光洒在石桥上", "明亮的花园小径", "晴空下的森林", "阳光照耀的湖面",
+            "晴天的乡村小路", "阳光下的山丘"
+        ]
+
+        # 根据天气随机选择场景
         if 'rain' in condition or 'drizzle' in condition:
-            scene = "雨天景色：或细雨中的江南水乡，或小桥流水、烟雨朦胧，或者细雨霏霏的城市街道，或淅淅沥沥的窗外...阴雨缠绵"
+            scene = random.choice(rain_scenes)
         elif 'cloud' in condition or 'overcast' in condition:
-            scene = "多云景色：或云雾缭绕的山水画，或阴云密布....意境深远"
+            scene = random.choice(cloud_scenes)
         elif 'snow' in condition:
-            scene = "雪天景色：如雪后的宁静村庄，如白雪皑皑的平原，如枯树厚雪...静谧美好"
-        else:  # sunny/clear
-            scene = "晴天景色：阳光明媚的田园风光，或金色麦田，或蓝天白云...视野宽阔"
+            scene = random.choice(snow_scenes)
+        else:
+            scene = random.choice(sunny_scenes)
 
-        # 根据时段调整光线
-        if time_of_day == 'morning':
-            lighting = "在清晨"
-        elif time_of_day == 'afternoon':
-            lighting = "在午后"
-        elif time_of_day == 'evening':
-            lighting = "在傍晚"
-        else:  # night
-            lighting = "在深夜"
+        # 时段光线
+        lighting_map = {
+            'morning': "清晨",
+            'afternoon': "午后",
+            'evening': "傍晚",
+            'night': "深夜"
+        }
+        lighting = lighting_map.get(time_of_day, "清晨")
 
-        prompt = f"{scene}，{lighting}，风格为油画或者卡通，色彩柔和，笔触细腻，氛围宁静放松，让人看到之后心胸开阔心情愉悦，高质量，专业摄影"
+        # 风格随机选择
+        styles = ["油画", "卡通", "水彩画", "数字插画"]
+        style = random.choice(styles)
+
+        # 修饰词随机选择 2 个
+        adjectives = ["柔和色彩", "细腻笔触", "宁静氛围", "明亮光影", "梦幻感觉", "舒适放松"]
+        adj = ", ".join(random.sample(adjectives, 2))
+
+        prompt = f"{scene}，{lighting}，风格为{style}，{adj}，让人心胸开阔，心情愉悦，高质量，专业摄影"
 
         return prompt
 

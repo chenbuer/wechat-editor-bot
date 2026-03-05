@@ -8,6 +8,7 @@ Markdown 转微信公众号 HTML 转换器
 从 md2wechat.py 移动到 modules 目录
 """
 
+import argparse
 import markdown
 import sys
 import os
