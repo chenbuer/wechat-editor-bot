@@ -9,6 +9,7 @@ output/articles/*.md
 output/html/*.html
 output/images/*
 output/archive/*
+output/*.json
 
 # Keep directory structure
 !output/articles/.gitkeep
