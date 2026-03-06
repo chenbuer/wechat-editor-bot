@@ -208,6 +208,16 @@ blockquote p {{
     color: {theme['text']};
 }}
 
+/* blockquote 中的 h2 不应用通用 h2 样式 */
+blockquote h2 {{
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0 0 8px 0;
+    font-size: 20px;
+}}
+
 /* 列表 */
 ul, ol {{
     margin: 12px 0;
