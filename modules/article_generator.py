@@ -176,7 +176,7 @@ class ArticleGenerator:
                      custom_topic: str = None) -> str:
         """构建 AI 提示词"""
         news_list = "\n\n".join([
-            f"【{i+1}】{item.title}\n来源：{item.source}\n摘要：{item.summary}"
+            f"【{i+1}】{item['title']}\n来源：{item['source']}\n摘要：{item['summary']}"
             for i, item in enumerate(news_items)
         ])
 

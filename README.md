@@ -163,6 +163,9 @@ templates:
       query: "最新财经新闻 股市行情 A股港股美股指数"
       num_results: 50
       time_range: 24  # 最近 24 小时
+      include_domains: []  # 可选：限制搜索域名（留空则搜索所有网站）
+        # - "reuters.com"
+        # - "bloomberg.com"
       exclude_keywords:
         - "加密货币"
         - "赌博"
@@ -328,6 +331,10 @@ tail -f finance_news_bot.log
 - 检查 appid/secret 是否正确
 - 确认公众号类型支持素材管理接口
 - 图片大小 < 2MB（系统会自动压缩）
+- **IP 白名单问题**：如遇到 `errcode: 40164` 错误，需要在微信公众平台添加 IP 白名单
+  - 登录 [微信公众平台](https://mp.weixin.qq.com/)
+  - 进入 设置 → 安全中心 → IP 白名单
+  - 添加你的服务器或本地 IP 地址
 - 查看[微信错误码文档](https://developers.weixin.qq.com/doc/offiaccount/Return_codes/Return_code_descriptions_new.html)
 
 ### 天气获取失败

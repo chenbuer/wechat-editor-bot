@@ -116,10 +116,9 @@ class ExaNewsGatherer:
         }
 
         # 可选：域名过滤
-        include_domains = self.config.get('exa_search', {}).get('include_domains', [])
-        if include_domains:
-            payload['include_domains'] = include_domains
-            logger.info(f"启用域名过滤: {include_domains}")
+        if self.include_domains:
+            payload['include_domains'] = self.include_domains
+            logger.info(f"启用域名过滤: {self.include_domains}")
 
         logger.info(f"Exa 搜索查询: {query}")
         logger.info(f"日期范围: {start_date} 至 {end_date}")
