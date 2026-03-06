@@ -34,7 +34,7 @@ class ArticleGenerator:
 
         # 支持新的时段标题格式配置
         self.title_formats = config.get('title_formats', {})
-        self.title_format = config.get('title_format', '不大早的财经早报 | {date}')
+        self.title_format = config.get('title_format', '财经早报 | {date}')
 
         # 设置默认值
         if self.ai_provider == "anthropic":

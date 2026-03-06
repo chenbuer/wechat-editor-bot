@@ -145,7 +145,7 @@ h2 {{
 A: 编辑 `config/finance_news_config.yaml`:
 ```yaml
 article:
-  title_format: "不大早的财经早报 | {date}"
+  title_format: "财经早报 | {date}"
 ```
 
 ### Q: 如何调整间距？

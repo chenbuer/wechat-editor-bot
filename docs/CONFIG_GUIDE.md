@@ -60,12 +60,12 @@ news:
 article:
   # 文章标题格式（根据时段自动选择）
   title_formats:
-    morning: "不大早的财经早报 | {date}"    # 早晨 (2:00-10:00)
+    morning: "财经早报 | {date}"    # 早晨 (2:00-10:00)
     afternoon: "财经速递 | {date}"          # 白天 (10:00-17:00)
     evening: "财经日报 | {date}"            # 晚上 (17:00-2:00)
 
   # 默认标题格式（兼容旧配置）
-  title_format: "不大早的财经早报 | {date}"  # {date} 会被替换为日期
+  title_format: "财经早报 | {date}"  # {date} 会被替换为日期
 
   # 文章结构（可自定义）
   sections:

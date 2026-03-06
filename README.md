@@ -144,7 +144,7 @@ news:
   max_sources: 10
 
 article:
-  title_format: "不大早的财经早报 | {date}"
+  title_format: "财经早报 | {date}"
   min_length: 1200
   max_length: 1800
   style: "professional_engaging"
@@ -200,7 +200,7 @@ wechat:
 - `WECHAT_SECRET` - 微信公众号 Secret
 
 **定时任务：** 每天北京时间 07:00 自动运行，根据触发时间生成不同类型的文章：
-- 早晨 (2:00-10:00)：生成"不大早的财经早报"
+- 早晨 (2:00-10:00)：生成"财经早报"
 - 白天 (10:00-17:00)：生成"财经速递"
 - 晚上 (17:00-2:00)：生成"财经日报"
 

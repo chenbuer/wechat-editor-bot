@@ -1,6 +1,6 @@
 [project]
 name = "wechat-editor-bot"
-version = "0.1.0"
+version = "1.0.0"
 description = "自动化财经新闻采集、文章生成和微信公众号发布系统"
 readme = "README.md"
 requires-python = ">=3.9"
