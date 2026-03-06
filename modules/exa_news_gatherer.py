@@ -18,23 +18,31 @@ logger = logging.getLogger(__name__)
 class ExaNewsGatherer:
     """Exa API 新闻采集器"""
 
-    def __init__(self, config: dict, api_key: str):
+    def __init__(self, api_key: str, search_config: dict):
         """
         初始化 Exa 新闻采集器
 
         Args:
-            config: 新闻配置（包含 exa_search 配置）
             api_key: Exa API Key
+            search_config: 新闻搜索配置（包含 query, num_results, use_autoprompt 等）
         """
         self.api_key = api_key
-        self.config = config
+        self.search_config = search_config
         self.base_url = "https://api.exa.ai"
         self.cache_file = Path("output/.exa_cache.json")
+
+        # 从配置中读取参数
+        self.query = search_config.get('query', '最新新闻')
+        self.num_results = search_config.get('num_results', 50)
+        self.use_autoprompt = search_config.get('use_autoprompt', True)
+        self.include_domains = search_config.get('include_domains', [])
+        self.exclude_keywords = search_config.get('exclude_keywords', [])
+        self.time_range = search_config.get('time_range', 24)  # 小时数
 
         # 确保 output 目录存在
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
 
-        logger.info("ExaNewsGatherer 初始化完成")
+        logger.info(f"ExaNewsGatherer 初始化完成 (query: {self.query[:50]}...)")
 
     def gather_news(self, date_str: str) -> List[Dict]:
         """
@@ -53,17 +61,9 @@ class ExaNewsGatherer:
             logger.info("使用缓存的 Exa 搜索结果")
             return self._load_cache()
 
-        # 获取配置
-        exa_config = self.config.get('exa_search', {})
-        query = exa_config.get('query', '最新财经新闻 股市行情 A股港股美股指数 经济数据指标 宏观政策 国际经济动态')
-        num_results = exa_config.get('num_results', 50)
-        use_autoprompt = exa_config.get('use_autoprompt', True)
-        # 从顶层 news 配置读取 time_range
-        time_range = self.config.get('time_range', '24h')
-
         # 调用 Exa API
         try:
-            results = self._search_exa(query, num_results, use_autoprompt, time_range)
+            results = self._search_exa(self.query, self.num_results, self.use_autoprompt, self.time_range)
             logger.info(f"从 Exa 获取到 {len(results)} 条原始结果")
 
             # 客户端过滤
@@ -84,7 +84,7 @@ class ExaNewsGatherer:
             raise
 
     def _search_exa(self, query: str, num_results: int,
-                    use_autoprompt: bool, time_range: str) -> List[Dict]:
+                    use_autoprompt: bool, time_range: int) -> List[Dict]:
         """
         调用 Exa API 进行搜索
 
@@ -92,7 +92,7 @@ class ExaNewsGatherer:
             query: 搜索查询
             num_results: 返回结果数量
             use_autoprompt: 是否使用自动提示优化
-            time_range: 时间范围 (24h 或 48h)
+            time_range: 时间范围（小时数，如 24 表示最近 24 小时）
 
         Returns:
             Exa API 返回的结果列表
@@ -142,12 +142,12 @@ class ExaNewsGatherer:
         results = data.get('results', [])
         return results
 
-    def _calculate_date_range(self, time_range: str) -> tuple:
+    def _calculate_date_range(self, time_range: int) -> tuple:
         """
         计算搜索的日期范围
 
         Args:
-            time_range: 时间范围 (24h 或 48h)
+            time_range: 时间范围（小时数，如 24 表示最近 24 小时）
 
         Returns:
             (start_date, end_date) ISO 格式字符串
@@ -156,12 +156,7 @@ class ExaNewsGatherer:
         end_date = datetime.now()
 
         # 计算时间范围
-        if time_range == '48h':
-            hours = 48
-        else:
-            hours = 24
-
-        start_date = end_date - timedelta(hours=hours)
+        start_date = end_date - timedelta(hours=time_range)
 
         # 转换为 ISO 格式
         start_iso = start_date.strftime('%Y-%m-%dT%H:%M:%S.000Z')
@@ -179,7 +174,6 @@ class ExaNewsGatherer:
         Returns:
             过滤后的新闻列表
         """
-        exclude_keywords = self.config.get('exclude_keywords', [])
         filtered = []
 
         for item in results:
@@ -201,7 +195,7 @@ class ExaNewsGatherer:
 
             # 检查排除关键词
             full_text = f"{title} {content_summary}".lower()
-            if any(keyword.lower() in full_text for keyword in exclude_keywords):
+            if any(keyword.lower() in full_text for keyword in self.exclude_keywords):
                 logger.debug(f"排除新闻（包含排除关键词）: {title}")
                 continue
 

@@ -1,20 +1,28 @@
-# Financial News Automation System
+# WeChat Editor Bot - 微信编辑器机器人
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
-自动化财经新闻采集、文章生成和微信公众号发布系统。每天自动生成专业财经日报，配以天气主题封面图，一键发布到微信公众号。
+通用的内容生成和微信公众号发布平台。支持多种文章类型（财经、科技、通用新闻、知识解读），自动采集新闻、生成文章、配图并发布到微信公众号。
 
 ## ✨ 核心特性
 
-- 🔍 **智能新闻采集** - 基于关键词自动搜索 24 小时财经新闻，过滤敏感内容
-- ✍️ **AI 文章生成** - 使用 DeepSeek/Claude API 生成专业、易读的财经文章（1200-1800 字）
+- 📝 **多种文章类型** - 支持财经日报、科技资讯、通用新闻摘要、知识解读等多种文章类型
+- 🔍 **智能新闻采集** - 基于文章类型自动配置搜索关键词，灵活过滤内容
+- ✍️ **AI 文章生成** - 使用 DeepSeek/Claude API 生成专业、易读的文章（1200-1800 字）
 - 🌤️ **AI 天气服务** - 使用 DeepSeek AI 获取实时天气信息
 - 🎨 **天气主题封面** - 根据实时天气生成油画风格封面图（晴天/阴天/雨天不同风格）
 - 📱 **微信自动发布** - 自动转换为微信格式并创建草稿（支持人工审核）
 - 🗂️ **文件自动管理** - 30 天自动归档，保持目录整洁
-- 🎨 **精美排版** - 编者按卡片样式，小字免责声明，无分割线干扰
-- ⚙️ **高度可配置** - 新闻源、文章结构、样式主题均可自定义
+- 🎨 **精美排版** - 编者按卡片样式，小字免责声明，支持多种主题
+- ⚙️ **高度可配置** - 文章类型、新闻源、样式主题均可自定义
+
+## 📚 支持的文章类型
+
+1. **财经日报** (`financial_report`) - 股市行情、经济数据、政策动态
+2. **科技资讯** (`tech_news`) - 产品发布、技术突破、行业动态
+3. **通用新闻摘要** (`general_news`) - 任意主题的新闻汇总
+4. **知识解读** (`knowledge_explanation`) - 解释经济名词、历史事件等
 
 ## 🚀 快速开始
 
@@ -23,6 +31,7 @@
 - Python 3.9+
 - 微信公众号（服务号或认证订阅号）
 - DeepSeek API Key（文章生成 + 天气获取，推荐）或 Claude API Key
+- Exa API Key（新闻搜索）
 - 图片生成 API（TuZi/OpenAI/Gemini/ModelScope 任选其一）
 
 ### 安装
@@ -79,32 +88,132 @@ wechat:
 
 ```bash
 # Mock 模式测试（不消耗 API 配额）
-uv run python finance_news_bot.py --mock
+uv run python wechat_editor_bot.py --mock
 
-# 生产模式（真实 API 调用）
-uv run python finance_news_bot.py
+# 生产模式（使用默认文章类型：财经日报）
+uv run python wechat_editor_bot.py
+
+# 生成科技资讯
+uv run python wechat_editor_bot.py --article-type tech_news
+
+# 生成通用新闻摘要
+uv run python wechat_editor_bot.py --article-type general_news
+
+# 生成知识解读（需要指定主题）
+uv run python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"
 
 # 自定义配置文件
-uv run python finance_news_bot.py --config custom_config.yaml --secrets custom_secrets.yaml
+uv run python wechat_editor_bot.py --config custom_config.yaml --secrets custom_secrets.yaml
 ```
+
+## 📖 配置文件说明
+
+### 主配置文件 (`config/wechat_bot_config.yaml`)
+
+通用配置，包括默认文章类型、图片配置、微信发布配置等。
+
+```yaml
+article:
+  article_type: "financial_report"  # 默认文章类型
+  style: "professional_engaging"
+  min_length: 1200
+  max_length: 1800
+  include_summary: true
+
+image:
+  primary_size: "3000x1276"
+  secondary_size: "2000x2000"
+  style: "oil_painting"
+  mood: "relaxing"
+
+weather:
+  location: "Nanjing"
+
+wechat:
+  auto_publish: false
+  create_draft: true
+  theme: "warm"
+  author: "Jasper"
+  enable_comment: true
+  only_fans_comment: false
+
+cleanup:
+  keep_days: 3
+  archive_enabled: true
+```
+
+### 模板配置文件 (`config/article_templates.yaml`)
+
+定义每种文章类型的标题格式、新闻搜索配置、内容结构和样式。
+
+```yaml
+templates:
+  financial_report:
+    name: "财经日报"
+
+    # 标题格式（支持时段格式或空字符串让 AI 生成）
+    title_formats:
+      morning: "财经早报 | {date}"
+      afternoon: "财经速递 | {date}"
+      evening: "财经日报 | {date}"
+
+    # 新闻搜索配置
+    news_search:
+      enabled: true
+      query: "最新财经新闻 股市行情 A股港股美股指数"
+      num_results: 50
+      time_range: 24  # 最近 24 小时
+      exclude_keywords:
+        - "加密货币"
+        - "赌博"
+
+    # 文章结构
+    summary:
+      title: "📝 编者按"
+      prompt: "用 2-3 句话概括今日市场核心要点"
+
+    body:
+      prompt: "撰写财经报道，包括新闻速递、市场表现、市场展望"
+
+    footer:
+      content: "本文内容仅供参考，不构成投资建议。"
+
+  tech_news:
+    name: "科技资讯"
+    title_formats: ""  # 空字符串表示由 AI 生成标题
+    # ... 其他配置
+```
+
+## 🎨 自定义文章类型
+
+你可以在 `config/article_templates.yaml` 中添加新的文章类型：
+
+1. 定义标题格式（`title_formats`）- 可以是时段格式、固定格式或空字符串（AI 生成）
+2. 配置新闻搜索（`news_search`）- 包括搜索关键词、时间范围、结果数量等
+3. 设置摘要样式（`summary`）
+4. 提供正文结构参考（`body`）
+5. 配置页脚内容（`footer`）
+
+详见 [文章模板使用指南](docs/article_templates_usage.md)。
 
 ## 📁 项目结构
 
 ```
 wechat-editor-bot/
-├── finance_news_bot.py          # 主程序入口
+├── wechat_editor_bot.py         # 主程序入口
+├── finance_news_bot.py          # 兼容旧版入口
 ├── pyproject.toml               # 项目配置和依赖
 ├── uv.lock                      # 依赖锁定文件
 ├── modules/                     # 核心模块
-│   ├── news_gatherer.py         # 新闻采集
+│   ├── exa_news_gatherer.py     # Exa 新闻采集
 │   ├── article_generator.py     # AI 文章生成
 │   ├── weather_service.py       # 天气服务
 │   ├── image_generator.py       # 封面图生成
 │   ├── wechat_publisher.py      # 微信 API 集成
-│   ├── markdown_converter.py    # Markdown → 微信 HTML
 │   └── file_manager.py          # 文件管理
 ├── config/
-│   ├── finance_news_config.yaml # 常规配置
+│   ├── wechat_bot_config.yaml   # 主配置文件
+│   ├── article_templates.yaml   # 文章模板配置
 │   ├── secrets.yaml             # 敏感配置（不提交）
 │   └── secrets.yaml.example     # 配置模板
 ├── output/                      # 输出目录
@@ -125,56 +234,36 @@ wechat-editor-bot/
 
 ### 关键配置项
 
-**finance_news_config.yaml**（常规配置）：
+**wechat_bot_config.yaml**（主配置）：
 
 ```yaml
-news:
-  sources:
-    - name: "财联社"
-      enabled: true
-      priority: 1
-    - name: "金十数据"
-      enabled: true
-      priority: 1
-    - name: "雪球"
-      enabled: true
-      priority: 2
-  search_keywords: ["股市 财经", "经济 金融", "A股 市场"]
-  exclude_keywords: ["加密货币", "比特币", "政治"]
-  max_sources: 10
-
 article:
-  title_format: "财经早报 | {date}"
+  article_type: "financial_report"  # 默认文章类型
+  style: "professional_engaging"
   min_length: 1200
   max_length: 1800
-  style: "professional_engaging"
-  sections:
-    - name: "编者按"
-      enabled: true
-      emoji: "📝"
-    - name: "新闻速递"
-      enabled: true
-      emoji: "📰"
-    - name: "股市表现"
-      enabled: true
-      emoji: "📊"
-    - name: "市场展望"
-      enabled: true
-      emoji: "🔮"
+  include_summary: true
 
 image:
-  primary_size: "900x383"  # 微信主图尺寸
+  primary_size: "3000x1276"
+  secondary_size: "2000x2000"
   style: "oil_painting"
   mood: "relaxing"
 
 weather:
-  location: "Shanghai"
-  provider: "ai"  # 使用 AI 获取天气
+  location: "Nanjing"
 
 wechat:
+  auto_publish: false
   create_draft: true
-  auto_publish: false  # 强烈建议保持 false，人工审核后发布
-  theme: "ocean"  # 主题：ocean（深海静谧）或 fresh（清新绿色）或 warm(热情似火)
+  theme: "warm"  # 主题：ocean（深海静谧）、fresh（清新绿色）、warm（热情似火）
+  author: "Jasper"
+  enable_comment: true
+  only_fans_comment: false
+
+cleanup:
+  keep_days: 3
+  archive_enabled: true
 ```
 
 ## 🎨 文章样式特性
@@ -199,7 +288,7 @@ wechat:
 - `WECHAT_APPID` - 微信公众号 AppID
 - `WECHAT_SECRET` - 微信公众号 Secret
 
-**定时任务：** 每天北京时间 07:00 自动运行，根据触发时间生成不同类型的文章：
+**定时任务：** 每天北京时间 07:00 自动运行，根据触发时间生成对应的文章标题：
 - 早晨 (2:00-10:00)：生成"财经早报"
 - 白天 (10:00-17:00)：生成"财经速递"
 - 晚上 (17:00-2:00)：生成"财经日报"
@@ -249,9 +338,9 @@ tail -f finance_news_bot.log
 
 ### 文章质量不佳
 
-- 调整 `config/finance_news_config.yaml` 中的 `article.style`
+- 调整 `config/article_templates.yaml` 中的模板配置
 - 修改 `modules/article_generator.py` 中的提示词
-- 增加 `news.max_sources` 获取更多新闻源
+- 调整新闻搜索的 `num_results` 获取更多新闻源
 
 ## 📚 文档
 

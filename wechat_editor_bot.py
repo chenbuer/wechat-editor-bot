@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-财经新闻自动化机器人
-主程序入口
+微信编辑器机器人
+支持多种文章类型的通用内容生成平台
 """
 
 import logging
@@ -12,9 +12,9 @@ import argparse
 import yaml
 from pathlib import Path
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
-# 添加父目录到路径以导入 md2wechat
+# 添加父目录到路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from modules.news_gatherer import NewsGatherer, NewsItem
@@ -30,15 +30,15 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('finance_news_bot.log', encoding='utf-8')
+        logging.FileHandler('wechat_editor_bot.log', encoding='utf-8')
     ]
 )
 
 logger = logging.getLogger(__name__)
 
 
-class FinanceNewsBot:
-    """财经新闻机器人"""
+class WeChatEditorBot:
+    """微信编辑器机器人 - 支持多种文章类型"""
 
     def __init__(self, config_path: str, secrets_path: str = None, mock_mode: bool = False):
         self.mock_mode = mock_mode
@@ -51,44 +51,26 @@ class FinanceNewsBot:
 
         # 获取 API 配置
         api_config = self.secrets.get('api', {})
-        deepseek_key = api_config.get('deepseek_key')
-        deepseek_base_url = api_config.get('deepseek_base_url', 'https://api.deepseek.com')
-        deepseek_model = api_config.get('deepseek_model', 'deepseek-chat')
-        exa_api_key = api_config.get('exa_api_key')
+        self.deepseek_key = api_config.get('deepseek_key')
+        self.deepseek_base_url = api_config.get('deepseek_base_url', 'https://api.deepseek.com')
+        self.deepseek_model = api_config.get('deepseek_model', 'deepseek-chat')
+        self.exa_api_key = api_config.get('exa_api_key')
 
-        # 初始化各模块 - 使用 Exa API
-        self.news_gatherer = NewsGatherer(
-            self.config['news'],
-            exa_api_key=exa_api_key,
-            ai_api_key=deepseek_key,
-            ai_base_url=deepseek_base_url,
-            ai_model=deepseek_model
-        )
-
-        # 准备文章生成器配置（添加新闻源信息）
+        # 准备文章生成器配置
         article_config = self.config['article'].copy()
 
-        # 从 news.sources 提取启用的新闻源名称
-        news_sources = self.config.get('news', {}).get('sources', [])
-        enabled_sources = [s['name'] for s in news_sources if s.get('enabled', True)]
-        if enabled_sources:
-            article_config['news_sources'] = enabled_sources
-
         # 文章生成器 - 优先使用 DeepSeek，fallback 到 Anthropic
-
-        if deepseek_key:
-            # 使用 DeepSeek
+        if self.deepseek_key:
             logger.info("使用 DeepSeek API 生成文章")
             self.article_generator = ArticleGenerator(
                 article_config,
-                api_key=deepseek_key,
+                api_key=self.deepseek_key,
                 ai_provider="openai",
-                api_base_url=deepseek_base_url,
-                model_name=deepseek_model,
+                api_base_url=self.deepseek_base_url,
+                model_name=self.deepseek_model,
                 mock_mode=mock_mode
             )
         else:
-            # Fallback 到 Anthropic
             logger.info("DeepSeek 未配置，使用 Anthropic API")
             anthropic_key = api_config.get('anthropic_key') or os.getenv('ANTHROPIC_API_KEY')
             self.article_generator = ArticleGenerator(
@@ -99,17 +81,17 @@ class FinanceNewsBot:
                 mock_mode=mock_mode
             )
 
-        # 天气服务 - 传递 DeepSeek 配置用于 AI 获取天气
+        # 天气服务
         weather_config = self.config.get('weather', {})
         location = weather_config.get('location', 'Nanjing')
         self.weather_service = WeatherService(
             location=location,
-            ai_api_key=deepseek_key,
-            ai_base_url=deepseek_base_url,
-            ai_model=deepseek_model
+            ai_api_key=self.deepseek_key,
+            ai_base_url=self.deepseek_base_url,
+            ai_model=self.deepseek_model
         )
 
-        # 图片生成器 - 从 secrets 获取配置
+        # 图片生成器
         image_config = {
             'provider': self.secrets.get('api', {}).get('image_provider', 'tuzi'),
             'api_key': self.secrets.get('api', {}).get('image_key') or os.getenv('IMAGE_API_KEY'),
@@ -118,12 +100,11 @@ class FinanceNewsBot:
         }
         self.image_generator = ImageGenerator(self.config['image'], image_config)
 
-        # 微信发布器 - 从 secrets 获取配置
-        # 即使在 Mock 模式下也需要初始化（用于 HTML 转换）
+        # 微信发布器
         wechat_config = {
             'appid': self.secrets.get('wechat', {}).get('appid'),
             'secret': self.secrets.get('wechat', {}).get('secret'),
-            'theme': self.config.get('wechat', {}).get('theme', 'ocean'),
+            'theme': self.config.get('wechat', {}).get('theme', 'warm'),
             'author': self.config.get('wechat', {}).get('author', ''),
             'enable_comment': self.config.get('wechat', {}).get('enable_comment', False),
             'only_fans_comment': self.config.get('wechat', {}).get('only_fans_comment', False)
@@ -161,37 +142,60 @@ class FinanceNewsBot:
             logger.error(f"加载 secrets 配置失败: {e}")
             return {}
 
-    def run(self):
-        """运行主流程"""
+    def run(self, article_type: str = None, custom_topic: str = None):
+        """
+        运行主流程
+
+        Args:
+            article_type: 文章类型（如不指定则使用配置中的默认值）
+            custom_topic: 自定义主题（用于知识解读类文章）
+        """
+        # 确定文章类型
+        article_type = article_type or self.config['article'].get('article_type', 'financial_report')
+
         logger.info("=" * 60)
-        logger.info("财经新闻自动化机器人启动")
+        logger.info("微信编辑器机器人启动")
         logger.info(f"模式: {'Mock' if self.mock_mode else 'Production'}")
+        logger.info(f"文章类型: {article_type}")
+        if custom_topic:
+            logger.info(f"自定义主题: {custom_topic}")
         logger.info("=" * 60)
 
         date_str = datetime.now().strftime('%Y%m%d')
 
         try:
-            # 1. 采集新闻
-            logger.info("\n[步骤 1/7] 采集财经新闻")
-            news_items = self._gather_news(date_str)
+            # 1. 获取新闻搜索配置
+            search_config = self.article_generator.get_news_search_config(article_type, custom_topic)
 
-            # 2. 生成文章
+            # 2. 如果需要搜索新闻，则采集新闻
+            news_items = []
+            if search_config:
+                logger.info(f"\n[步骤 1/7] 采集新闻（类型: {article_type}）")
+                news_items = self._gather_news(date_str, search_config)
+            else:
+                logger.info(f"\n[步骤 1/7] 跳过新闻采集（文章类型 {article_type} 不需要新闻）")
+
+            # 3. 生成文章
             logger.info("\n[步骤 2/7] 生成文章")
-            article_md = self.article_generator.generate_article(news_items, date_str)
-            md_path = self.file_manager.save_article(article_md, date_str, 'md')
+            article_md = self.article_generator.generate_article(
+                news_items=news_items,
+                date_str=date_str,
+                article_type=article_type,
+                custom_topic=custom_topic
+            )
+            md_path = self.file_manager.save_article(article_md, date_str, 'md', article_type)
 
-            # 3. 转换为微信 HTML
+            # 4. 转换为微信 HTML
             logger.info("\n[步骤 3/7] 转换为微信 HTML")
-            theme = self.config.get('wechat', {}).get('theme', 'ocean')
+            theme = self.config.get('wechat', {}).get('theme', 'warm')
             article_html = self.wechat_publisher.convert_to_wechat_html(
                 article_md, theme=theme
             )
-            html_path = self.file_manager.save_article(article_html, date_str, 'html')
+            html_path = self.file_manager.save_article(article_html, date_str, 'html', article_type)
 
-            # 4. 获取天气信息
+            # 5. 获取天气信息
             logger.info("\n[步骤 4/7] 获取天气信息")
             if self.mock_mode:
-                # Mock 模式使用默认天气数据
                 weather_data = {
                     'condition': 'Clear',
                     'temperature': '20',
@@ -202,11 +206,10 @@ class FinanceNewsBot:
             else:
                 weather_data = self.weather_service.get_current_weather()
 
-            # 5. 生成封面图片
+            # 6. 生成封面图片
             logger.info("\n[步骤 5/7] 生成封面图片")
             if self.mock_mode:
-                # Mock 模式：生成一个简单的占位图片
-                from PIL import Image, ImageDraw, ImageFont
+                from PIL import Image, ImageDraw
                 from io import BytesIO
 
                 # 主图
@@ -227,11 +230,9 @@ class FinanceNewsBot:
                 img_secondary.save(buffer_secondary, format='JPEG', quality=85)
                 secondary_image = buffer_secondary.getvalue()
             else:
-                # 生成主图
                 cover_image = self.image_generator.generate_cover_image(
                     weather_data, size=self.config['image']['primary_size']
                 )
-                # 生成次图
                 secondary_image = self.image_generator.generate_cover_image(
                     weather_data, size=self.config['image']['secondary_size']
                 )
@@ -239,15 +240,13 @@ class FinanceNewsBot:
             image_path = self.file_manager.save_image(cover_image, date_str, 'primary')
             secondary_image_path = self.file_manager.save_image(secondary_image, date_str, 'secondary')
 
-            # 6. 上传到微信
+            # 7. 上传到微信
             if not self.mock_mode and self.config['wechat']['create_draft']:
                 logger.info("\n[步骤 6/7] 上传到微信")
-                # 上传主图
                 media_id = self.wechat_publisher.upload_image(image_path)
-                # 上传次图
                 secondary_media_id = self.wechat_publisher.upload_image(secondary_image_path)
 
-                # 7. 创建草稿
+                # 8. 创建草稿
                 logger.info("\n[步骤 7/7] 创建草稿")
                 title = self._extract_title(article_md)
                 draft_media_id = self.wechat_publisher.create_draft(
@@ -268,7 +267,7 @@ class FinanceNewsBot:
                 logger.info(f"次图: {secondary_image_path}")
                 logger.info("=" * 60)
 
-            # 8. 清理旧文件
+            # 9. 清理旧文件
             logger.info("\n[清理] 清理旧文件")
             self.file_manager.cleanup_old_files()
 
@@ -276,56 +275,41 @@ class FinanceNewsBot:
             logger.error(f"\n❌ 运行失败: {e}", exc_info=True)
             raise
 
-    def _gather_news(self, date_str: str) -> List[NewsItem]:
-        """采集新闻（在 Mock 模式下使用示例数据）"""
+    def _gather_news(self, date_str: str, search_config: dict) -> List[NewsItem]:
+        """
+        采集新闻
+
+        Args:
+            date_str: 日期字符串
+            search_config: 新闻搜索配置
+
+        Returns:
+            新闻列表
+        """
         if self.mock_mode:
             # Mock 数据
             return [
                 NewsItem(
-                    title="A股三大指数集体收涨，科技股领涨",
-                    source="财经网",
-                    summary="今日A股三大指数集体收涨，上证指数涨1.2%，深证成指涨1.5%，创业板指涨2.1%。科技股表现强势，半导体板块领涨。",
+                    title="示例新闻标题 1",
+                    source="示例来源",
+                    summary="这是一条示例新闻的摘要内容。",
                     url="https://example.com/news1"
                 ),
                 NewsItem(
-                    title="央行宣布降准0.5个百分点",
-                    source="新华财经",
-                    summary="中国人民银行宣布下调金融机构存款准备金率0.5个百分点，释放长期资金约1万亿元，支持实体经济发展。",
+                    title="示例新闻标题 2",
+                    source="示例来源",
+                    summary="这是另一条示例新闻的摘要内容。",
                     url="https://example.com/news2"
-                ),
-                NewsItem(
-                    title="新能源汽车销量持续增长",
-                    source="证券时报",
-                    summary="2月新能源汽车销量同比增长35%，市场渗透率突破40%。多家车企宣布扩产计划。",
-                    url="https://example.com/news3"
                 )
             ]
         else:
-            # 使用 NewsGatherer 实际搜索
-            return self.news_gatherer.gather_news(date_str)
-
-    def _gather_news_mock(self, date_str: str) -> List[NewsItem]:
-        """使用示例数据（临时方案）- 已废弃，保留以兼容"""
-        return [
-            NewsItem(
-                title="A股三大指数集体收涨，科技股领涨",
-                source="财经网",
-                summary="今日A股三大指数集体收涨，上证指数涨1.2%，深证成指涨1.5%，创业板指涨2.1%。科技股表现强势，半导体板块领涨。",
-                url="https://example.com/news1"
-            ),
-            NewsItem(
-                title="央行宣布降准0.5个百分点",
-                source="新华财经",
-                summary="中国人民银行宣布下调金融机构存款准备金率0.5个百分点，释放长期资金约1万亿元，支持实体经济发展。",
-                url="https://example.com/news2"
-            ),
-            NewsItem(
-                title="新能源汽车销量持续增长",
-                source="证券时报",
-                summary="2月新能源汽车销量同比增长35%，市场渗透率突破40%。多家车企宣布扩产计划。",
-                url="https://example.com/news3"
+            # 使用动态配置创建 NewsGatherer
+            from modules.exa_news_gatherer import ExaNewsGatherer
+            news_gatherer = ExaNewsGatherer(
+                api_key=self.exa_api_key,
+                search_config=search_config
             )
-        ]
+            return news_gatherer.gather_news(date_str)
 
     def _extract_title(self, markdown_content: str) -> str:
         """从 Markdown 中提取标题"""
@@ -333,19 +317,21 @@ class FinanceNewsBot:
         for line in lines:
             if line.startswith('# '):
                 return line[2:].strip()
-        return f"财经日报 - {datetime.now().strftime('%Y年%m月%d日')}"
+        return f"文章 - {datetime.now().strftime('%Y年%m月%d日')}"
 
 
 def main():
     """主函数"""
     parser = argparse.ArgumentParser(
-        description='财经新闻自动化机器人',
+        description='微信编辑器机器人 - 支持多种文章类型',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例：
-  python finance_news_bot.py                    # 生产模式
-  python finance_news_bot.py --mock             # Mock 模式（测试）
-  python finance_news_bot.py --config custom.yaml  # 自定义配置
+  python wechat_editor_bot.py                                    # 生产模式（默认文章类型）
+  python wechat_editor_bot.py --mock                             # Mock 模式（测试）
+  python wechat_editor_bot.py --article-type tech_news           # 生成科技资讯
+  python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"  # 知识解读
+  python wechat_editor_bot.py --config custom.yaml               # 自定义配置
         """
     )
 
@@ -364,6 +350,14 @@ def main():
         action='store_true',
         help='Mock 模式（不调用真实 API）'
     )
+    parser.add_argument(
+        '--article-type',
+        help='文章类型（financial_report, tech_news, general_news, knowledge_explanation）'
+    )
+    parser.add_argument(
+        '--topic',
+        help='自定义主题（用于知识解读类文章）'
+    )
 
     args = parser.parse_args()
 
@@ -380,8 +374,8 @@ def main():
         logger.warning("提示: 复制 config/secrets.yaml.template 为 config/secrets.yaml 并填入真实值")
 
     # 运行机器人
-    bot = FinanceNewsBot(str(config_path), str(secrets_path), mock_mode=args.mock)
-    bot.run()
+    bot = WeChatEditorBot(str(config_path), str(secrets_path), mock_mode=args.mock)
+    bot.run(article_type=args.article_type, custom_topic=args.topic)
 
 
 if __name__ == '__main__':

@@ -4,17 +4,17 @@
 
 ## 📐 样式概览
 
-### 编者按卡片
+### 今日看点（Summary）
 - **位置**: 文章开头，标题下方
 - **样式**:
-  - 统一的卡片容器（`<div class="editor-note-card">`）
-  - 渐变背景（浅蓝到白色）
-  - 左侧蓝色边框（4px）
-  - 圆角（8px）
-  - 阴影效果
+  - 使用 blockquote 容器
+  - 左侧主题色边框（6px）
+  - 主题色背景
+  - 圆角（4px）
+  - 内阴影效果
 - **内容**:
-  - 标题：20px，加粗，蓝色
-  - 正文：15px，斜体，灰色
+  - 标题：22px，加粗，主题色（如 💡 今日看点）
+  - 正文：16px，斜体，灰色
 
 ### 章节标题
 - **大章节**（一、二、三、）:
@@ -67,20 +67,21 @@ wechat:
 - **特点**:
 ## 🛠️ 自定义样式
 
-### 修改编者按样式
+### 修改"今日看点"样式
 
-编辑 `modules/markdown_converter.py`，找到 `.editor-note-card` 部分：
+编辑 `modules/markdown_converter.py`，找到 `blockquote` 部分：
 
 ```python
-/* 编者按卡片容器 */
-.editor-note-card {{
-    margin: 20px 0;
-    background: linear-gradient(135deg, {theme['caption_background']} 0%, #fff 100%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-left: 4px solid {theme['primary']};
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
+/* 引用块 */
+blockquote {{
+    margin: 16px 0;
+    padding: 14px 18px;
+    background: {theme['caption_background']};
+    border-left: 6px solid {theme['primary']};
+    border-radius: 4px;
+    color: {theme['text']};
+    font-style: italic;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.05);
 }}
 ```
 

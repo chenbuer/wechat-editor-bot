@@ -2,25 +2,28 @@
 # -*- coding: utf-8 -*-
 """
 文章生成模块
-使用 Claude API 生成财经文章
+使用 AI API 生成各类文章（财经、科技、通用新闻等）
+支持基于模板的灵活文章结构
 """
 
 import logging
-from typing import List
+from typing import List, Dict, Optional
 from datetime import datetime
 import os
+import yaml
 
 logger = logging.getLogger(__name__)
 
 
 class ArticleGenerator:
-    """文章生成器"""
+    """文章生成器 - 支持多种文章类型的通用生成器"""
 
     def __init__(self, config: dict, api_key: str = None,
                  ai_provider: str = "openai",
                  api_base_url: str = None,
                  model_name: str = None,
-                 mock_mode: bool = False):
+                 mock_mode: bool = False,
+                 template_config_path: str = None):
         self.config = config
         self.api_key = api_key
         self.ai_provider = ai_provider
@@ -36,6 +39,18 @@ class ArticleGenerator:
         self.title_formats = config.get('title_formats', {})
         self.title_format = config.get('title_format', '财经早报 | {date}')
 
+        # 加载文章模板配置
+        self.templates = self._load_templates(template_config_path)
+
+        # 默认文章类型（向后兼容）
+        self.default_article_type = config.get('article_type', 'financial_report')
+
+        # Mock 模板目录
+        self.mock_template_dir = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'templates', 'mock'
+        )
+
         # 设置默认值
         if self.ai_provider == "anthropic":
             self.api_key = self.api_key or os.getenv('ANTHROPIC_API_KEY')
@@ -45,29 +60,51 @@ class ArticleGenerator:
             self.api_base_url = self.api_base_url or "https://api.openai.com/v1"
             self.model_name = self.model_name or "gpt-4"
 
-    def generate_article(self, news_items: List, date_str: str) -> str:
+    def _load_templates(self, template_config_path: str = None) -> Dict:
+        """加载文章模板配置"""
+        if template_config_path is None:
+            # 默认路径
+            template_config_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
+                'config', 'article_templates.yaml'
+            )
+
+        try:
+            with open(template_config_path, 'r', encoding='utf-8') as f:
+                template_config = yaml.safe_load(f)
+                logger.info(f"成功加载文章模板配置: {template_config_path}")
+                return template_config
+        except Exception as e:
+            logger.warning(f"无法加载模板配置文件 {template_config_path}: {e}，使用默认模板")
+            return self._get_default_templates()
+
+    def generate_article(self, news_items: List, date_str: str,
+                        article_type: str = None, custom_topic: str = None) -> str:
         """
         生成文章
 
         Args:
             news_items: 新闻条目列表
             date_str: 日期字符串
+            article_type: 文章类型 (financial_report, tech_news, general_news, knowledge_explanation)
+            custom_topic: 自定义主题（用于知识解读类文章）
 
         Returns:
             Markdown 格式的文章内容
         """
-        logger.info(f"开始生成文章: {date_str}")
+        article_type = article_type or self.default_article_type
+        logger.info(f"开始生成文章: {date_str}, 类型: {article_type}")
 
         # Mock 模式：返回示例文章
         if self.mock_mode:
             logger.info("Mock 模式：使用示例文章")
-            return self._generate_mock_article(date_str)
+            return self._generate_mock_article(date_str, article_type)
 
         if not self.api_key:
             raise ValueError(f"未配置 API Key (provider: {self.ai_provider})")
 
         # 构建提示词
-        prompt = self._build_prompt(news_items, date_str)
+        prompt = self._build_prompt(news_items, date_str, article_type, custom_topic)
 
         # 根据 provider 调用不同的 API
         try:
@@ -78,8 +115,8 @@ class ArticleGenerator:
             else:
                 raise ValueError(f"不支持的 AI provider: {self.ai_provider}")
 
-            # 后处理：添加免责声明
-            article_content = self._post_process(article_content, date_str)
+            # 后处理：添加标题和页脚
+            article_content = self._post_process(article_content, date_str, article_type)
 
             logger.info(f"文章生成成功 (provider: {self.ai_provider})，长度: {len(article_content)} 字符")
             return article_content
@@ -88,9 +125,9 @@ class ArticleGenerator:
             logger.error(f"文章生成失败 (provider: {self.ai_provider}): {e}")
             raise
 
-    def _generate_mock_article(self, date_str: str) -> str:
+    def _generate_mock_article(self, date_str: str, article_type: str = 'financial_report') -> str:
         """生成 Mock 文章"""
-        return self._get_mock_article_template(date_str)
+        return self._get_mock_article_template(date_str, article_type)
 
     def _call_openai_api(self, prompt: str) -> str:
         """调用 OpenAI 兼容的 API（包括 DeepSeek）"""
@@ -134,7 +171,9 @@ class ArticleGenerator:
 
         return response.content[0].text
 
-    def _build_prompt(self, news_items: List, date_str: str) -> str:
+    def _build_prompt(self, news_items: List, date_str: str,
+                     article_type: str = 'financial_report',
+                     custom_topic: str = None) -> str:
         """构建 AI 提示词"""
         news_list = "\n\n".join([
             f"【{i+1}】{item.title}\n来源：{item.source}\n摘要：{item.summary}"
@@ -142,163 +181,160 @@ class ArticleGenerator:
         ])
 
         date_formatted = datetime.strptime(date_str, '%Y%m%d').strftime('%Y年%m月%d日')
-        title = self._format_title(date_str)
 
-        return self._get_prompt_template(date_formatted, news_list, title, date_str)
+        # 获取模板
+        template = self._get_template(article_type)
+        if not template:
+            logger.warning(f"未找到文章类型 {article_type} 的模板，使用默认模板")
+            template = self._get_template('financial_report')
 
-    def _post_process(self, content: str, date_str: str) -> str:
+        # 根据模板配置决定是否生成标题
+        title = self._format_title(date_str, article_type)
+
+        return self._build_prompt_from_template(
+            template, date_formatted, news_list, title, date_str, custom_topic
+        )
+
+    def _post_process(self, content: str, date_str: str, article_type: str = 'financial_report') -> str:
         """后处理文章内容"""
-        # 确保有标题（如果 AI 没有生成）
-        if not content.startswith('#'):
-            title = self._format_title(date_str)
-            content = f"# {title}\n\n{content}"
+        # 获取模板
+        template = self._get_template(article_type)
 
-        # 确保有免责声明（如果 AI 没有生成）
-        if '投资有风险' not in content:
-            disclaimer = "\n---\n\n本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。关注我们，获取更多财经资讯。\n"
-            content += disclaimer
+        # 确保有标题（如果 AI 没有生成且配置了标题格式）
+        if not content.startswith('#'):
+            title = self._format_title(date_str, article_type)
+            if title:  # 只有当有标题格式时才添加
+                content = f"# {title}\n\n{content}"
+
+        # 添加页脚（如果 AI 没有生成）
+        if template and 'footer' in template:
+            footer_content = template['footer'].get('content', '')
+            # 检查是否已经包含页脚内容的关键词
+            footer_keywords = ['仅供参考', '投资有风险', '关注我们']
+            has_footer = any(keyword in content for keyword in footer_keywords)
+
+            if not has_footer and footer_content:
+                content += f"\n\n---\n\n{footer_content.strip()}\n"
 
         return content
 
-    def _format_title(self, date_str: str) -> str:
-        """格式化文章标题，根据当前时间选择合适的标题格式"""
+    def _format_title(self, date_str: str, article_type: str = None) -> Optional[str]:
+        """
+        格式化文章标题，根据模板配置和当前时间选择合适的标题格式
+
+        Args:
+            date_str: 日期字符串 (YYYYMMDD)
+            article_type: 文章类型
+
+        Returns:
+            格式化的标题，如果配置为空字符串则返回 None（表示由 AI 生成）
+        """
         date_formatted = datetime.strptime(date_str, '%Y%m%d').strftime('%Y年%m月%d日')
 
-        # 如果配置了时段标题格式，根据当前时间选择
-        if self.title_formats:
-            title_format = self._get_title_format_by_time()
-        else:
-            title_format = self.title_format
+        # 优先从模板中获取 title_formats
+        title_format = None
+        if article_type:
+            template = self._get_template(article_type)
+            if template and 'title_formats' in template:
+                template_title_formats = template['title_formats']
+
+                # 如果配置为空字符串，返回 None 表示由 AI 生成标题
+                if template_title_formats == "":
+                    logger.info(f"文章类型 {article_type} 配置为 AI 生成标题")
+                    return None
+
+                # 如果是字典（时段格式），根据当前时间选择
+                if isinstance(template_title_formats, dict):
+                    title_format = self._get_title_format_by_time(template_title_formats)
+                # 如果是字符串，直接使用
+                elif isinstance(template_title_formats, str):
+                    title_format = template_title_formats
+
+        # 回退到主配置（向后兼容）
+        if not title_format:
+            if self.title_formats:
+                title_format = self._get_title_format_by_time(self.title_formats)
+            else:
+                title_format = self.title_format
 
         return title_format.replace('{date}', date_str).replace('{date_formatted}', date_formatted)
 
-    def _get_title_format_by_time(self) -> str:
-        """根据当前时间获取对应的标题格式"""
+    def _get_title_format_by_time(self, title_formats: dict) -> str:
+        """
+        根据当前时间获取对应的标题格式
+
+        Args:
+            title_formats: 标题格式字典
+
+        Returns:
+            对应时段的标题格式
+        """
         now = datetime.now()
         hour = now.hour
 
         # 早晨: 2:00-10:00
         if 2 <= hour < 10:
-            return self.title_formats.get('morning', self.title_format)
+            return title_formats.get('morning', self.title_format)
         # 白天: 10:00-17:00
         elif 10 <= hour < 17:
-            return self.title_formats.get('afternoon', self.title_format)
+            return title_formats.get('afternoon', self.title_format)
         # 晚上: 17:00-2:00
         else:
-            return self.title_formats.get('evening', self.title_format)
+            return title_formats.get('evening', self.title_format)
 
-    def _get_mock_article_template(self, date_str: str) -> str:
+    def _get_mock_article_template(self, date_str: str, article_type: str = 'financial_report') -> str:
         """获取 Mock 文章模板"""
         date_formatted = datetime.strptime(date_str, '%Y%m%d').strftime('%Y年%m月%d日')
-        title = self._format_title(date_str)
+        title = self._format_title(date_str, article_type)
 
-        return f"""# {title}
+        # 如果没有标题格式（AI 生成），使用默认标题
+        if not title:
+            title = f"{article_type} | {date_formatted}"
 
-## 📝 编者按
+        # 从文件加载 Mock 模板
+        return self._load_mock_template(article_type, title, date_formatted)
 
-{date_formatted}，市场迎来积极信号。央行降准释放万亿流动性，科技与新能源板块表现强势，A股三大指数集体收涨。国际市场方面，美股延续反弹态势，全球风险偏好有所回升。
+    def _load_mock_template(self, article_type: str, title: str, date_formatted: str) -> str:
+        """从文件加载 Mock 模板"""
+        template_file = os.path.join(self.mock_template_dir, f"{article_type}.md")
 
----
+        try:
+            with open(template_file, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+                # 替换占位符
+                return template_content.replace('{title}', title).replace('{date_formatted}', date_formatted)
+        except FileNotFoundError:
+            logger.warning(f"Mock 模板文件不存在: {template_file}，使用默认模板")
+            # 回退到 financial_report 模板
+            fallback_file = os.path.join(self.mock_template_dir, "financial_report.md")
+            try:
+                with open(fallback_file, 'r', encoding='utf-8') as f:
+                    template_content = f.read()
+                    return template_content.replace('{title}', title).replace('{date_formatted}', date_formatted)
+            except FileNotFoundError:
+                logger.error(f"默认 Mock 模板也不存在: {fallback_file}")
+                return f"# {title}\n\n*Mock 模式示例文章*\n\n{date_formatted}"
 
-## 一、新闻速递
+    def _get_template(self, article_type: str) -> Optional[Dict]:
+        """获取指定类型的文章模板"""
+        templates = self.templates.get('templates', {})
+        return templates.get(article_type)
 
-### 🇨🇳 国内要闻
+    def _build_prompt_from_template(self, template: Dict, date_formatted: str,
+                                    news_list: str, title: Optional[str], date_str: str,
+                                    custom_topic: str = None) -> str:
+        """根据模板构建提示词"""
+        article_name = template.get('name', '文章')
+        summary_config = template.get('summary', {})
+        body_config = template.get('body', {})
+        common_reqs = self.templates.get('common_requirements', {})
 
-**央行宣布降准0.5个百分点**
+        # 构建提示词
+        topic_info = f"\n\n**解读主题：** {custom_topic}" if custom_topic else ""
 
-中国人民银行宣布下调金融机构存款准备金率0.5个百分点，预计释放长期资金约1万亿元，支持实体经济发展，降低企业融资成本。
+        prompt = f"""你是一位资深记者和内容创作者，擅长撰写生动有趣的{article_name}。
 
-**新能源汽车销量持续增长**
-
-2月新能源汽车销量同比增长35%，市场渗透率突破40%。多家车企宣布扩产计划，行业景气度持续提升。
-
-**科技板块表现亮眼**
-
-今日科技板块整体上涨3.2%，人工智能、半导体等细分领域涨幅居前。多家科技公司发布业绩预告，显示行业基本面向好。
-
-### 🌍 国际动态
-
-**美联储官员释放鸽派信号**
-
-多位美联储官员表示，如果通胀继续回落，可能会考虑放缓加息步伐。市场对此反应积极，美股三大指数集体上涨。
-
-**国际油价小幅回调**
-
-受需求预期影响，国际油价小幅回调，布伦特原油跌0.8%至82美元/桶。
-
----
-
-## 二、市场表现
-
-### 🏦 A股市场
-
-**指数表现**
-
-上证指数收涨1.2%，报收3,245点；深证成指上涨1.5%，报收11,680点；创业板指大涨2.1%，报收2,456点。
-
-**热门板块**
-
-半导体板块领涨，涨幅超过4%；新能源汽车板块上涨3.5%；金融板块稳健上涨1.8%。
-
-**市场情绪**
-
-两市成交额较昨日放大15%，北向资金净流入约80亿元，市场情绪明显回暖。
-
-### 🦀 美股市场
-
-**指数表现**
-
-道琼斯指数上涨0.8%；纳斯达克指数上涨1.2%；标普500指数上涨0.9%。
-
-**板块动态**
-
-科技股表现强势，芯片、云计算板块领涨。
-
-### 🐂 全球市场
-
-**港股**：恒生指数上涨1.5%，科技股带动港股上涨。
-
-**欧洲股市**：普遍收涨，德国DAX指数涨0.6%。
-
-**日本股市**：日经225指数上涨0.4%。
-
----
-
-## 三、市场展望
-
-**市场走势预判**
-
-在政策利好和资金面改善的支持下，市场有望延续反弹态势。科技、新能源等成长板块仍是资金关注重点。
-
-**关键因素**
-
-关注后续经济数据的验证，留意外部环境变化，观察资金流向和板块轮动。
-
-**风险提示**
-
-市场普涨之后，板块与个股的分化或将随之而来。建议投资者保持理性，关注基本面良好、估值合理的优质标的，做好风险控制。
-
----
-
-本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。关注我们，获取更多财经资讯。
-
----
-
-*本文为 Mock 模式生成的示例文章*
-"""
-
-    def _get_prompt_template(self, date_formatted: str, news_list: str, title: str, date_str: str) -> str:
-        """获取 AI 提示词模板"""
-        # 根据标题判断文章类型
-        article_type = "财经早报"
-        if "速递" in title:
-            article_type = "财经速递"
-        elif "日报" in title:
-            article_type = "财经日报"
-
-        return f"""你是一位资深财经记者，擅长撰写生动有趣的{article_type}。
-
-今天是 {date_formatted}，请根据以下财经新闻，撰写一篇{article_type}。
+今天是 {date_formatted}，请根据以下新闻素材，撰写一篇{article_name}。{topic_info}
 
 **新闻素材：**
 {news_list}
@@ -309,73 +345,106 @@ class ArticleGenerator:
 - 如果新闻素材不足以填充某个章节，可以省略该章节或简化处理
 - 保持真实性，不要杜撰任何数据或新闻
 
-**文章结构（严格按照以下结构）：**
+**文章结构：**
 
-# {title}
+"""
 
-## 📝 编者按
-用 2-3 句话概括今日市场核心要点，语气轻松但专业。
+        # 如果有标题格式，使用固定标题；否则让 AI 生成标题
+        if title:
+            prompt += f"# {title}\n\n"
+        else:
+            prompt += "# [请根据内容生成一个简洁有力的标题]\n\n"
 
----
-
-## 一、新闻速递
-
-### 🇨🇳 国内要闻
-根据提供的新闻素材，列举国内重要的财经新闻，每条新闻：
-- 标题简洁有力
-- 1-2 句话说明要点和影响
-
-### 🌍 国际动态
-根据提供的新闻素材，列举国际重要的财经新闻，格式同上
-（如果新闻素材中没有国际新闻，可以省略此部分）
+        prompt += f"""> ## {summary_config.get('title', '摘要')}
+>
+> {summary_config.get('prompt', '概括核心要点')}
 
 ---
 
-## 二、市场表现
-包括：A股市市场、美股市场、全球市场。此为参考，若是新闻中有对于其他区域市场有重要信息，添加到对应市场部分。
-
-### 🏦 A股市场
-根据新闻素材整理指数表现、热门板块、市场情绪。（如果没有具体数据，使用描述性词汇）
-- 标题简洁有力
-- 说明要点、表述准确
-
-### 🦀 美股市场
-（如果新闻素材中没有美股信息，可以省略此部分）
-
-### 🐂 全球市场
-（如果新闻素材中没有全球市场信息，可以省略此部分）
-
----
-
-## 三、市场展望
-
-根据提供的新闻素材，分析：
-- 市场可能的走势
-- 需要关注的关键因素
-- 投资者应注意的风险点
-
-（不要编造未提供的信息，基于已有新闻进行合理分析即可，内容精简且专业）
-
----
-
-本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。
-关注我们，获取更多财经资讯。
+{body_config.get('prompt', '撰写正文内容')}
 
 ---
 
 **写作要求：**
-1. **真实性第一**：严格只使用提供的新闻素材，不要编造任何数据、新闻或信息
-2. **语言风格**：轻松活泼但不失专业，像朋友聊天一样自然
-3. **emoji 使用**：适当使用 emoji 增加可读性（📈📉💰🔥⚡️等）
-4. **数据呈现**：如果新闻中有具体数字就使用，没有就用描述性词汇，不要编造
-5. **排版**：
-   - 使用分隔线（---）区分章节
-   - 大章节标题使用 ## 一、## 二、## 三、
-   - 小标题使用 ###
-   - 重要信息用 **加粗**
-   - 禁止使用列表，取而代之使用段落
-6. **长度**：根据新闻素材的丰富程度灵活调整，保持内容充实但不冗余
-7. **合规**：遵守内容监管规定，不涉及敏感话题
-8. **免责声明**：文章最后用普通段落写免责声明
+1. **真实性第一**：{common_reqs.get('authenticity', '严格使用提供的素材')}
+2. **数据呈现**：{common_reqs.get('data_handling', '有数据就用，没有就用描述性词汇')}
+3. **长度**：{common_reqs.get('length', '根据素材灵活调整')}
+4. **合规**：{common_reqs.get('compliance', '遵守内容监管规定')}
+5. **排版**："""
 
-请严格按照上述结构输出文章，只使用提供的新闻素材，不要编造信息。"""
+        # 添加格式要求
+        formatting = common_reqs.get('formatting', [])
+        for i, fmt in enumerate(formatting, 1):
+            prompt += f"\n   - {fmt}"
+
+        prompt += "\n\n请严格按照上述结构输出文章，只使用提供的新闻素材，不要编造信息。"
+
+        # 注意：不在 prompt 中包含 footer，footer 在后处理中添加
+        return prompt
+
+    def _get_default_templates(self) -> Dict:
+        """获取默认模板配置（当无法加载配置文件时使用）"""
+        return {
+            'templates': {
+                'financial_report': {
+                    'name': '财经日报',
+                    'summary': {
+                        'title': '📝 编者按',
+                        'style': 'quote',
+                        'prompt': '用 2-3 句话概括今日市场核心要点，语气轻松但专业。'
+                    },
+                    'body': {
+                        'prompt': '根据新闻素材撰写财经报道，包括新闻速递、市场表现、市场展望等内容。'
+                    },
+                    'footer': {
+                        'content': '本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。\n关注我们，获取更多财经资讯。'
+                    }
+                }
+            },
+            'common_requirements': {
+                'authenticity': '严格只使用提供的新闻素材',
+                'data_handling': '如果新闻中有具体数字就使用，没有就用描述性词汇',
+                'length': '根据新闻素材的丰富程度灵活调整',
+                'compliance': '遵守内容监管规定，不涉及敏感话题',
+                'formatting': [
+                    '使用分隔线（---）区分章节',
+                    '重要信息用 **加粗**',
+                    '禁止使用列表，取而代之使用段落'
+                ]
+            }
+        }
+
+    def get_available_article_types(self) -> List[str]:
+        """获取所有可用的文章类型"""
+        templates = self.templates.get('templates', {})
+        return list(templates.keys())
+
+    def get_news_search_config(self, article_type: str, custom_topic: str = None) -> Optional[Dict]:
+        """
+        获取指定文章类型的新闻搜索配置
+
+        Args:
+            article_type: 文章类型
+            custom_topic: 自定义主题（用于替换 query 中的 {topic} 占位符）
+
+        Returns:
+            新闻搜索配置字典，如果不需要搜索则返回 None
+        """
+        template = self._get_template(article_type)
+        if not template or 'news_search' not in template:
+            logger.info(f"文章类型 {article_type} 没有配置 news_search")
+            return None
+
+        config = template['news_search'].copy()
+
+        # 检查是否启用
+        if not config.get('enabled', False):
+            logger.info(f"文章类型 {article_type} 的新闻搜索已禁用")
+            return None
+
+        # 如果查询中包含 {topic} 占位符，替换为实际主题
+        if custom_topic and 'query' in config:
+            config['query'] = config['query'].replace('{topic}', custom_topic)
+            logger.info(f"替换主题占位符: {custom_topic}")
+
+        return config

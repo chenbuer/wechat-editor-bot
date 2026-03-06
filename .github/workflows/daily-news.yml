@@ -1,4 +1,4 @@
-name: Daily Financial News
+name: Daily Content Generation
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:  # 允许手动触发
 
 jobs:
-  generate-news:
+  generate-content:
     runs-on: ubuntu-latest
 
     steps:
@@ -64,8 +64,8 @@ jobs:
           image_model: "${{ secrets.IMAGE_MODEL }}"
         EOF
 
-    - name: Run financial news bot
-      run: uv run python finance_news_bot.py
+    - name: Run WeChat editor bot
+      run: uv run python wechat_editor_bot.py
       env:
         TZ: 'Asia/Shanghai'
 
@@ -73,7 +73,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: news-articles-${{ github.run_number }}
+        name: articles-${{ github.run_number }}
         path: |
           output/articles/*.md
           output/html/*.html
@@ -83,7 +83,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: news-images-${{ github.run_number }}
+        name: images-${{ github.run_number }}
         path: output/images/*.jpg
         retention-days: 30
 
@@ -98,5 +98,5 @@ jobs:
     - name: Notify on failure
       if: failure()
       run: |
-        echo "❌ 财经新闻生成失败"
+        echo "❌ 内容生成失败"
         echo "请检查日志了解详情"

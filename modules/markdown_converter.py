@@ -131,15 +131,6 @@ h2 {{
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }}
 
-/* 编者按标题不应用通用 h2 样式 */
-.editor-note-card h2 {{
-    background: none;
-    border: none;
-    box-shadow: none;
-    padding: 14px 20px 10px 20px;
-    margin: 0;
-    font-size: 20px;
-}}
 
 h3 {{
     font-size: 20px;
@@ -168,33 +159,6 @@ p {{
     line-height: 1.75;
 }}
 
-/* 编者按卡片容器 */
-.editor-note-card {{
-    margin: 20px 0;
-    border-left: 4px solid {theme['primary']};
-    overflow: hidden;
-}}
-
-/* 编者按标题 */
-.editor-note-title {{
-    font-size: 20px;
-    font-weight: 600;
-    color: {theme['text']};
-    margin: 0;
-    padding: 14px 20px 10px 20px;
-    line-height: 1.4;
-}}
-
-/* 编者按内容 */
-.editor-note-content {{
-    margin: 0;
-    padding: 0 20px 14px 20px;
-    text-align: justify;
-    color: #555;
-    line-height: 1.75;
-    font-style: italic;
-    font-size: 15px;
-}}
 
 /* 免责声明 - 小字提示 */
 .disclaimer-text {{
@@ -234,12 +198,9 @@ a:hover {{
 blockquote {{
     margin: 16px 0;
     padding: 14px 18px;
-    background: {theme['caption_background']};
     border-left: 6px solid {theme['primary']};
-    border-radius: 4px;
     color: {theme['text']};
     font-style: italic;
-    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.05);
 }}
 
 blockquote p {{
@@ -416,31 +377,12 @@ def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme=
     from bs4 import BeautifulSoup
     soup = BeautifulSoup(content_html, 'html.parser')
 
-    # 处理编者按卡片样式（第一个 h2 + 第一个 p 包装到 div 中）
-    h2_tags = soup.find_all('h2')
-    if h2_tags:
-        first_h2 = h2_tags[0]
-        next_p = first_h2.find_next_sibling('p')
-
-        if next_p:
-            # 创建一个 div 包装编者按
-            editor_note_div = soup.new_tag('div', **{'class': 'editor-note-card'})
-
-            # 修改 h2 和 p 的 class
-            first_h2['class'] = 'editor-note-title'
-            next_p['class'] = 'editor-note-content'
-
-            # 将 h2 和 p 移到 div 中
-            first_h2.insert_before(editor_note_div)
-            editor_note_div.append(first_h2.extract())
-            editor_note_div.append(next_p.extract())
-
-        # 处理免责声明 - 查找包含"投资有风险"的段落
-        all_p_tags = soup.find_all('p')
-        for p in all_p_tags:
-            if '投资有风险' in p.get_text():
-                p['class'] = 'disclaimer-text'
-                break
+    # 处理免责声明 - 查找包含"投资有风险"的段落
+    all_p_tags = soup.find_all('p')
+    for p in all_p_tags:
+        if '投资有风险' in p.get_text():
+            p['class'] = 'disclaimer-text'
+            break
 
     content_html = str(soup)
 

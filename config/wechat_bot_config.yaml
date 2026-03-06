@@ -1,0 +1,37 @@
+# 微信编辑器机器人配置
+# 非敏感配置 - 可以提交到 Git
+# 敏感信息（API Key, AppID 等）请配置在 secrets.yaml
+
+# 文章生成配置
+article:
+  article_type: "financial_report"  # 默认文章类型
+
+  style: "professional_engaging"
+  min_length: 1200
+  max_length: 1800
+  include_summary: true
+
+# 图片生成配置
+image:
+  primary_size: "3000x1276"
+  secondary_size: "2000x2000"
+  style: "oil_painting"
+  mood: "relaxing"
+
+# 天气服务配置
+weather:
+  location: "Nanjing"
+
+# 微信发布配置
+wechat:
+  auto_publish: false
+  create_draft: true
+  theme: "warm"
+  author: "Jasper"
+  enable_comment: true
+  only_fans_comment: false
+
+# 文件管理配置
+cleanup:
+  keep_days: 3
+  archive_enabled: true

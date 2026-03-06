@@ -37,7 +37,7 @@ class FileManager:
         for directory in [self.articles_dir, self.html_dir, self.images_dir, self.archive_dir]:
             directory.mkdir(parents=True, exist_ok=True)
 
-    def save_article(self, content: str, date_str: str, format_type: str) -> str:
+    def save_article(self, content: str, date_str: str, format_type: str, article_type: str = 'financial_report') -> str:
         """
         保存文章
 
@@ -45,14 +45,24 @@ class FileManager:
             content: 文章内容
             date_str: 日期字符串 (YYYYMMDD)
             format_type: 格式类型 ('md' 或 'html')
+            article_type: 文章类型 (financial_report, tech_news, general_news, knowledge_explanation)
 
         Returns:
             保存的文件路径
         """
+        # 根据文章类型生成文件名前缀
+        type_prefix_map = {
+            'financial_report': 'finance-news',
+            'tech_news': 'tech-news',
+            'general_news': 'general-news',
+            'knowledge_explanation': 'knowledge'
+        }
+        prefix = type_prefix_map.get(article_type, article_type)
+
         if format_type == 'md':
-            file_path = self.articles_dir / f"finance-news-{date_str}.md"
+            file_path = self.articles_dir / f"{prefix}-{date_str}.md"
         elif format_type == 'html':
-            file_path = self.html_dir / f"finance-news-{date_str}.html"
+            file_path = self.html_dir / f"{prefix}-{date_str}.html"
         else:
             raise ValueError(f"不支持的格式: {format_type}")
 
