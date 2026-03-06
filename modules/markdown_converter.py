@@ -4,8 +4,6 @@
 Markdown 转微信公众号 HTML 转换器
 支持多主题：清新绿色、深海静谧、热情似火
 适配电脑端和手机端
-
-从 md2wechat.py 移动到 modules 目录
 """
 
 import argparse
@@ -500,10 +498,10 @@ def main():
   warm   - 热情似火主题
 
 示例：
-  python md2wechat.py article.md
-  python md2wechat.py article.md -o output.html
-  python md2wechat.py article.md -t ocean
-  python md2wechat.py article.md -t ocean -o output.html
+  python markdown_converter.py article.md
+  python markdown_converter.py article.md -o output.html
+  python markdown_converter.py article.md -t ocean
+  python markdown_converter.py article.md -t ocean -o output.html
         """
     )
 
