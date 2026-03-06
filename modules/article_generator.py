@@ -73,6 +73,23 @@ class ArticleGenerator:
             with open(template_config_path, 'r', encoding='utf-8') as f:
                 template_config = yaml.safe_load(f)
                 logger.info(f"成功加载文章模板配置: {template_config_path}")
+
+                # 如果配置中包含 template_files，则加载拆分的模板文件
+                if 'template_files' in template_config:
+                    templates = {}
+                    config_dir = os.path.dirname(template_config_path)
+
+                    for template_name, template_file in template_config['template_files'].items():
+                        template_path = os.path.join(config_dir, template_file)
+                        try:
+                            with open(template_path, 'r', encoding='utf-8') as tf:
+                                templates[template_name] = yaml.safe_load(tf)
+                                logger.info(f"成功加载模板: {template_name} from {template_path}")
+                        except Exception as e:
+                            logger.warning(f"无法加载模板文件 {template_path}: {e}")
+
+                    template_config['templates'] = templates
+
                 return template_config
         except Exception as e:
             logger.warning(f"无法加载模板配置文件 {template_config_path}: {e}，使用默认模板")
