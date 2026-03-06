@@ -231,7 +231,7 @@ class ArticleGenerator:
             has_footer = any(keyword in content for keyword in footer_keywords)
 
             if not has_footer and footer_content:
-                content += f"\n\n---\n\n{footer_content.strip()}\n"
+                content += f"\n\n---\n\n<!-- footer -->\n{footer_content.strip()}\n<!-- /footer -->\n"
 
         return content
 

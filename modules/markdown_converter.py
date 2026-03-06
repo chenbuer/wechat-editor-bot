@@ -160,8 +160,8 @@ p {{
 }}
 
 
-/* 免责声明 - 小字提示 */
-.disclaimer-text {{
+/* Footer 文字 - 小字提示 */
+.footer-text {{
     text-align: center;
     color: #999;
     font-size: 12px;
@@ -383,15 +383,19 @@ def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme=
     md = markdown.Markdown(extensions=extensions)
     content_html = md.convert(md_content)
 
+    # 移除 footer 相关的 HTML 注释
+    import re
+    content_html = re.sub(r'<!--\s*/?footer\s*-->', '', content_html)
+
     # 使用 BeautifulSoup 处理特殊样式
     from bs4 import BeautifulSoup
     soup = BeautifulSoup(content_html, 'html.parser')
 
-    # 处理免责声明 - 查找包含"投资有风险"的段落
+    # 处理 footer - 查找包含"本文内容仅供参考"的段落
     all_p_tags = soup.find_all('p')
     for p in all_p_tags:
-        if '投资有风险' in p.get_text():
-            p['class'] = 'disclaimer-text'
+        if '本文内容仅供参考' in p.get_text():
+            p['class'] = 'footer-text'
             break
 
     content_html = str(soup)
