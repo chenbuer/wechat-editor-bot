@@ -509,8 +509,8 @@ def main():
 
     parser.add_argument('input', help='输入的 Markdown 文件')
     parser.add_argument('-o', '--output', help='输出的 HTML 文件（默认：输入文件名.html）')
-    parser.add_argument('-t', '--theme', choices=['fresh', 'ocean', 'warm'], default='fresh',
-                        help='主题选择（默认：fresh）')
+    parser.add_argument('-t', '--theme', choices=['fresh', 'ocean', 'warm'], default='warm',
+                        help='主题选择（默认：warm）')
     parser.add_argument('--title', help='HTML 标题（默认：文件名）')
 
     args = parser.parse_args()
