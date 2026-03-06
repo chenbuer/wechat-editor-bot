@@ -29,7 +29,6 @@ class ExaNewsGatherer:
         self.api_key = api_key
         self.search_config = search_config
         self.base_url = "https://api.exa.ai"
-        self.cache_file = Path("output/.exa_cache.json")
 
         # 从配置中读取参数
         self.query = search_config.get('query', '最新新闻')
@@ -39,10 +38,15 @@ class ExaNewsGatherer:
         self.exclude_keywords = search_config.get('exclude_keywords', [])
         self.time_range = search_config.get('time_range', 24)  # 小时数
 
+        # 根据搜索配置生成唯一的缓存文件名
+        cache_key = self._generate_cache_key()
+        self.cache_file = Path(f"output/.exa_cache_{cache_key}.json")
+
         # 确保 output 目录存在
         self.cache_file.parent.mkdir(parents=True, exist_ok=True)
 
         logger.info(f"ExaNewsGatherer 初始化完成 (query: {self.query[:50]}...)")
+        logger.info(f"缓存文件: {self.cache_file.name}")
 
     def gather_news(self, date_str: str) -> List[Dict]:
         """
@@ -224,6 +228,29 @@ class ExaNewsGatherer:
             return domain
         except Exception:
             return "未知来源"
+
+    def _generate_cache_key(self) -> str:
+        """
+        根据搜索配置生成缓存键
+
+        Returns:
+            缓存键字符串（用于文件名）
+        """
+        import hashlib
+
+        # 使用关键配置参数生成哈希
+        key_parts = [
+            self.query,
+            str(self.num_results),
+            str(self.use_autoprompt),
+            ','.join(sorted(self.include_domains)),
+            ','.join(sorted(self.exclude_keywords)),
+            str(self.time_range)
+        ]
+
+        key_string = '|'.join(key_parts)
+        hash_obj = hashlib.md5(key_string.encode('utf-8'))
+        return hash_obj.hexdigest()[:8]  # 使用前 8 位
 
     def _is_cache_valid(self) -> bool:
         """检查缓存是否有效（1 小时内）"""

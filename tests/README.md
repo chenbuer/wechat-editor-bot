@@ -17,7 +17,7 @@ python tests/test_article_generation.py
 python tests/test_structure.py
 
 # Mock 模式完整流程测试（不消耗 API 配额）
-python finance_news_bot.py --mock
+python wechat_editor_bot.py --mock
 ```
 
 ## 测试说明

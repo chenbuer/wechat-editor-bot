@@ -121,7 +121,7 @@ python tests/test_article_generation.py
 ### Mock 模式（不消耗 API 配额）
 
 ```bash
-python finance_news_bot.py --mock
+python wechat_editor_bot.py --mock
 ```
 
 这将：
@@ -133,7 +133,11 @@ python finance_news_bot.py --mock
 ### 生产模式
 
 ```bash
-python finance_news_bot.py
+# 财经日报
+python wechat_editor_bot.py --article-type financial_report
+
+# 科技资讯
+python wechat_editor_bot.py --article-type tech_news
 ```
 
 这将：
@@ -203,14 +207,14 @@ pip install -e .
 
 1. **测试文章生成**: `python tests/test_article_generation.py`
 2. **查看输出**: `ls -la output/test/`
-3. **运行 Mock 模式**: `python finance_news_bot.py --mock`
+3. **运行 Mock 模式**: `python wechat_editor_bot.py --mock`
 4. **配置定时任务**: 参考 README.md 中的 cron 配置
-5. **监控日志**: `tail -f finance_news_bot.log`
+5. **监控日志**: `tail -f wechat_editor_bot.log`
 
 ## 获取帮助
 
 ```bash
-python finance_news_bot.py --help
+python wechat_editor_bot.py --help
 ```
 
 ## 相关文档
@@ -229,7 +233,7 @@ rm -rf .venv
 rm -rf output/*
 
 # 删除日志
-rm -f finance_news_bot.log
+rm -f wechat_editor_bot.log
 
 # 删除缓存
 rm -f output/.exa_cache.json

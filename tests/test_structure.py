@@ -10,7 +10,7 @@ from pathlib import Path
 def test_structure():
     """测试项目结构"""
     print("=" * 60)
-    print("财经新闻自动化系统 - 结构验证")
+    print("微信编辑器机器人 - 结构验证")
     print("=" * 60)
 
     base_dir = Path(__file__).parent
@@ -34,10 +34,10 @@ def test_structure():
 
     # 检查文件
     files = [
-        'finance_news_bot.py',
+        'wechat_editor_bot.py',
         'requirements.txt',
         'README.md',
-        'config/finance_news_config.yaml',
+        'config/wechat_bot_config.yaml',
         'modules/__init__.py',
         'modules/news_gatherer.py',
         'modules/article_generator.py',
@@ -61,10 +61,10 @@ def test_structure():
     print("\n下一步:")
     print("1. 安装依赖: pip install -r requirements.txt")
     print("2. 配置 API 密钥:")
-    print("   - 编辑 ../config.yaml 配置微信和图片 API")
+    print("   - 编辑 config/secrets.yaml 配置 API 密钥")
     print("   - 设置环境变量: export ANTHROPIC_API_KEY=your_key")
-    print("3. 测试运行: python finance_news_bot.py --mock")
-    print("4. 生产运行: python finance_news_bot.py")
+    print("3. 测试运行: python wechat_editor_bot.py --mock")
+    print("4. 生产运行: python wechat_editor_bot.py --article-type financial_report")
 
 if __name__ == '__main__':
     test_structure()

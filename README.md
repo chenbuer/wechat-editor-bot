@@ -204,7 +204,6 @@ templates:
 ```
 wechat-editor-bot/
 ├── wechat_editor_bot.py         # 主程序入口
-├── finance_news_bot.py          # 兼容旧版入口
 ├── pyproject.toml               # 项目配置和依赖
 ├── uv.lock                      # 依赖锁定文件
 ├── modules/                     # 核心模块
@@ -301,8 +300,8 @@ cleanup:
 ```bash
 crontab -e
 
-# 每天 7:00 运行
-0 7 * * * cd /path/to/wechat-editor-bot && uv run python finance_news_bot.py >> logs/cron.log 2>&1
+# 每天 7:00 运行（财经日报）
+0 7 * * * cd /path/to/wechat-editor-bot && uv run python wechat_editor_bot.py --article-type financial_report >> logs/cron.log 2>&1
 ```
 
 ## 💰 成本估算
@@ -323,7 +322,7 @@ crontab -e
 cat config/secrets.yaml | grep image
 
 # 查看日志
-tail -f finance_news_bot.log
+tail -f wechat_editor_bot.log
 ```
 
 ### 微信上传失败
