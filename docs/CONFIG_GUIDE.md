@@ -2,15 +2,18 @@
 
 ## 配置文件结构
 
-项目使用三个配置文件：
+项目使用多个配置文件：
 
 ### 1. `config/wechat_bot_config.yaml` - 主配置文件
 包含非敏感的业务配置，可以提交到 Git。
 
-### 2. `config/article_templates.yaml` - 文章模板配置
-定义每种文章类型的标题格式、新闻搜索配置、内容结构和样式。
+### 2. `config/article_templates.yaml` - 模板索引配置
+定义模板文件路径和通用写作要求。
 
-### 3. `config/secrets.yaml` - 敏感配置
+### 3. `config/templates/*.yaml` - 文章模板详情
+每种文章类型有独立的模板文件（financial_report.yaml、tech_news.yaml 等）。
+
+### 4. `config/secrets.yaml` - 敏感配置
 包含 API 密钥、AppID 等敏感信息，**不应提交到 Git**（已在 .gitignore 中）。
 
 ## 配置详解
@@ -52,83 +55,17 @@ cleanup:
   archive_enabled: true
 ```
 
-### article_templates.yaml
+### article_templates.yaml（模板索引）
 
 ```yaml
-templates:
-  # 财经日报模板
-  financial_report:
-    name: "财经日报"
+# 模板文件路径配置
+template_files:
+  financial_report: "templates/financial_report.yaml"
+  tech_news: "templates/tech_news.yaml"
+  general_news: "templates/general_news.yaml"
+  knowledge_explanation: "templates/knowledge_explanation.yaml"
 
-    # 标题格式配置
-    title_formats:
-      morning: "财经早报 | {date}"
-      afternoon: "财经速递 | {date}"
-      evening: "财经日报 | {date}"
-
-    # 新闻搜索配置
-    news_search:
-      enabled: true
-      query: "最新财经新闻 股市行情 A股港股美股指数"
-      num_results: 50
-      use_autoprompt: true
-      time_range: 24  # 最近 24 小时
-      exclude_keywords:
-        - "加密货币"
-        - "比特币"
-        - "赌博"
-
-    # 摘要配置
-    summary:
-      title: "📝 编者按"
-      style: "quote"
-      prompt: "用 2-3 句话概括今日市场核心要点，语气轻松但专业。"
-
-    # 正文配置
-    body:
-      prompt: |
-        根据新闻素材撰写财经报道，包括：
-        - 新闻速递（国内要闻、国际动态）
-        - 市场表现（A股、美股、全球市场）
-        - 市场展望（走势预判、关键因素、风险提示）
-
-    # 页脚配置
-    footer:
-      content: |
-        本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。
-        关注我们，获取更多财经资讯。
-
-  # 科技资讯模板
-  tech_news:
-    name: "科技资讯"
-    title_formats: ""  # 空字符串表示由 AI 生成标题
-
-    news_search:
-      enabled: true
-      query: "科技新闻 人工智能 芯片 自动驾驶 产品发布"
-      num_results: 50
-      use_autoprompt: true
-      time_range: 24
-
-    summary:
-      title: "💡 今日看点"
-      style: "quote"
-      prompt: "用 2-3 句话概括今日科技领域的核心动态。"
-
-    body:
-      prompt: |
-        根据新闻素材撰写科技资讯，包括：
-        - 重磅新闻
-        - 产品与技术
-        - 行业动态
-        - 趋势观察
-
-    footer:
-      content: |
-        本文内容仅供参考，不代表投资建议。
-        关注我们，获取更多科技资讯。
-
-# 通用要求
+# 通用写作要求（适用于所有模板）
 common_requirements:
   authenticity: "严格只使用提供的新闻素材，不要编造任何数据、新闻或信息"
   data_handling: "如果新闻中有具体数字就使用，没有就用描述性词汇，不要编造"
@@ -136,11 +73,63 @@ common_requirements:
   compliance: "遵守内容监管规定，不涉及敏感话题"
   formatting:
     - "使用分隔线（---）区分章节"
-    - "大章节标题使用 ## 一、## 二、## 三、"
-    - "小标题使用 ###"
     - "重要信息用 **加粗**"
     - "禁止使用列表，取而代之使用段落"
 ```
+
+### templates/financial_report.yaml（财经日报模板）
+
+```yaml
+# 财经日报模板
+name: "财经日报"
+
+# 标题格式配置（支持时段格式或空字符串让 AI 生成）
+title_formats:
+  morning: "财经早报 | {date}"
+  afternoon: "财经速递 | {date}"
+  evening: "财经日报 | {date}"
+
+# 新闻搜索配置
+news_search:
+  enabled: true
+  query: "最新财经新闻 股市行情 A股港股美股指数"
+  num_results: 50
+  use_autoprompt: true
+  include_domains: []
+  exclude_keywords:
+    - "加密货币"
+    - "赌博"
+  time_range: 24
+
+summary:
+  title: "📝 编者按"
+  style: "quote"
+  prompt: "用 2-3 句话概括今日市场核心要点，语气轻松但专业。"
+
+body:
+  reference_structure: |
+    ## 一、新闻速递
+    ### 🇨🇳 国内要闻
+    ### 🌍 国际动态
+
+    ## 二、市场表现
+    ### 🏦 A股市场
+    ### 🦀 美股市场
+    ### 🐂 全球市场
+
+    ## 三、市场展望
+
+  prompt: |
+    根据提供的新闻素材撰写正文，参考以下结构（可根据内容灵活调整）...
+    （详细提示词省略）
+
+footer:
+  content: |
+    本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。
+    关注我们，获取更多财经资讯。
+```
+
+其他文章类型模板（tech_news.yaml、general_news.yaml、knowledge_explanation.yaml）结构类似，具体内容请查看 [docs/article_templates_usage.md](article_templates_usage.md)。
 
 ### secrets.yaml
 

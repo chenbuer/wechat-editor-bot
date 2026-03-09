@@ -41,7 +41,7 @@
 
 ## 🎨 主题配置
 
-系统支持两种主题，在 `config/finance_news_config.yaml` 中配置：
+系统支持多种主题，在 `config/wechat_bot_config.yaml` 中配置：
 
 ```yaml
 wechat:
@@ -61,10 +61,10 @@ wechat:
 - **特点**: 清新、活泼、自然
 
 ### Warm 主题（热情红色）
-- **主色**: #5f0101
-- **背景**: 
-- **适合**: 
-- **特点**:
+- **主色**: #c9371d（深红）
+- **背景**: #f9f5f2（浅米色）
+- **适合**: 热点新闻、活动公告
+- **特点**: 温暖、活泼、吸引注意力
 ## 🛠️ 自定义样式
 
 ### 修改"今日看点"样式
@@ -143,7 +143,7 @@ h2 {{
 ## 🔧 常见问题
 
 ### Q: 如何修改文章标题格式？
-A: 编辑 `config/finance_news_config.yaml`:
+A: 编辑对应模板文件（如 `config/templates/financial_report.yaml`）中的 `title_formats`，或在 `config/wechat_bot_config.yaml` 中设置默认值。
 ```yaml
 article:
   title_format: "财经早报 | {date}"

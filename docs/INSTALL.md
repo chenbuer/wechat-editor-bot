@@ -82,7 +82,7 @@ wechat:
 
 ### 2. 自定义配置（可选）
 
-编辑 `config/finance_news_config.yaml` 调整参数：
+编辑 `config/wechat_bot_config.yaml` 调整参数：
 
 ```yaml
 news:

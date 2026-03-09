@@ -11,7 +11,7 @@
 ## 配置文件
 
 ### 主配置文件
-`config/finance_news_config.yaml` - 设置默认文章类型
+`config/wechat_bot_config.yaml` - 设置默认文章类型
 
 ```yaml
 article:
@@ -19,7 +19,8 @@ article:
 ```
 
 ### 模板配置文件
-`config/article_templates.yaml` - 定义各种文章类型的模板
+`config/article_templates.yaml` - 定义模板文件路径和通用要求
+`config/templates/*.yaml` - 定义各种文章类型的详细模板
 
 ## 支持的文章类型
 
@@ -107,31 +108,53 @@ print(available_types)
 
 ### 添加新的文章类型
 
-在 `config/article_templates.yaml` 中添加新模板：
+**步骤 1：** 在 `config/article_templates.yaml` 中添加模板索引：
 
 ```yaml
-templates:
-  my_custom_type:
-    name: "自定义文章类型"
-    summary:
-      title: "📌 核心摘要"
-      style: "quote"
-      prompt: "用简洁的语言概括核心内容"
+template_files:
+  my_custom_type: "templates/my_custom_type.yaml"
+```
 
-    body:
-      reference_structure: |
-        ## 一、主要内容
-        ## 二、详细分析
+**步骤 2：** 创建 `config/templates/my_custom_type.yaml`：
 
-      prompt: |
-        根据新闻素材撰写文章，包含以下内容：
-        - 主要内容：列举关键信息
-        - 详细分析：深入解读
+```yaml
+name: "自定义文章类型"
 
-    footer:
-      content: |
-        本文内容仅供参考。
-        关注我们，获取更多资讯。
+# 标题格式配置
+title_formats:
+  morning: "自定义早报 | {date}"
+  evening: "自定义日报 | {date}"
+
+# 新闻搜索配置
+news_search:
+  enabled: true
+  query: "自定义搜索关键词"
+  num_results: 30
+  use_autoprompt: true
+  include_domains: []
+  exclude_keywords:
+    - "排除的关键词"
+  time_range: 24
+
+summary:
+  title: "📌 核心摘要"
+  style: "quote"
+  prompt: "用简洁的语言概括核心内容"
+
+body:
+  reference_structure: |
+    ## 一、主要内容
+    ## 二、详细分析
+
+  prompt: |
+    根据新闻素材撰写文章，包含以下内容：
+    - 主要内容：列举关键信息
+    - 详细分析：深入解读
+
+footer:
+  content: |
+    本文内容仅供参考。
+    关注我们，获取更多资讯。
 ```
 
 ### 修改现有模板
@@ -180,10 +203,10 @@ article = generator.generate_article(
 ## 常见问题
 
 ### Q: 如何修改文章的标题格式？
-A: 在 `config/finance_news_config.yaml` 中修改 `title_formats` 配置。
+A: 编辑对应模板文件（如 `config/templates/financial_report.yaml`）中的 `title_formats` 配置。
 
 ### Q: 如何调整文章长度？
-A: 在 `config/finance_news_config.yaml` 中修改 `min_length` 和 `max_length`。
+A: 在 `config/wechat_bot_config.yaml` 中修改 `min_length` 和 `max_length`。
 
 ### Q: 如何更改 AI 模型？
 A: 在初始化 `ArticleGenerator` 时指定 `model_name` 参数。

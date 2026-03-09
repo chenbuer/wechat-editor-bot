@@ -203,49 +203,75 @@ cleanup:
   archive_enabled: true
 ```
 
-### 模板配置文件 (`config/article_templates.yaml`)
+### 模板配置文件
 
-定义每种文章类型的标题格式、新闻搜索配置、内容结构和样式。
+模板配置分为两个文件：
+
+**1. 模板索引 (`config/article_templates.yaml`)**
 
 ```yaml
-templates:
-  financial_report:
-    name: "财经日报"
+# 模板文件路径配置
+template_files:
+  financial_report: "templates/financial_report.yaml"
+  tech_news: "templates/tech_news.yaml"
+  general_news: "templates/general_news.yaml"
+  knowledge_explanation: "templates/knowledge_explanation.yaml"
 
-    # 标题格式（支持时段格式或空字符串让 AI 生成）
-    title_formats:
-      morning: "财经早报 | {date}"
-      afternoon: "财经速递 | {date}"
-      evening: "财经日报 | {date}"
+# 通用写作要求（适用于所有模板）
+common_requirements:
+  authenticity: "严格只使用提供的新闻素材，不要编造任何数据、新闻或信息"
+  data_handling: "如果新闻中有具体数字就使用，没有就用描述性词汇，不要编造"
+  length: "根据新闻素材的丰富程度灵活调整，保持内容充实但不冗余"
+  compliance: "遵守内容监管规定，不涉及敏感话题"
+  formatting:
+    - "使用分隔线（---）区分章节"
+    - "重要信息用 **加粗**"
+    - "禁止使用列表，取而代之使用段落"
+```
 
-    # 新闻搜索配置
-    news_search:
-      enabled: true
-      query: "最新财经新闻 股市行情 A股港股美股指数"
-      num_results: 50
-      time_range: 24  # 最近 24 小时
-      include_domains: []  # 可选：限制搜索域名（留空则搜索所有网站）
-        # - "reuters.com"
-        # - "bloomberg.com"
-      exclude_keywords:
-        - "加密货币"
-        - "赌博"
+**2. 模板详情 (`config/templates/*.yaml`)**
 
-    # 文章结构
-    summary:
-      title: "📝 编者按"
-      prompt: "用 2-3 句话概括今日市场核心要点"
+以财经日报模板为例 (`config/templates/financial_report.yaml`)：
 
-    body:
-      prompt: "撰写财经报道，包括新闻速递、市场表现、市场展望"
+```yaml
+# 财经日报模板
+name: "财经日报"
 
-    footer:
-      content: "本文内容仅供参考，不构成投资建议。"
+# 标题格式配置（支持时段格式或空字符串让 AI 生成）
+title_formats:
+  morning: "财经早报 | {date}"
+  afternoon: "财经速递 | {date}"
+  evening: "财经日报 | {date}"
 
-  tech_news:
-    name: "科技资讯"
-    title_formats: ""  # 空字符串表示由 AI 生成标题
-    # ... 其他配置
+# 新闻搜索配置
+news_search:
+  enabled: true
+  query: "最新财经新闻 股市行情 A股港股美股指数"
+  num_results: 50
+  use_autoprompt: true
+  include_domains: []
+  exclude_keywords:
+    - "加密货币"
+    - "赌博"
+  time_range: 24
+
+summary:
+  title: "📝 编者按"
+  style: "quote"
+  prompt: "用 2-3 句话概括今日市场核心要点，语气轻松但专业。"
+
+body:
+  reference_structure: |
+    ## 一、新闻速递
+    ## 二、市场表现
+    ## 三、市场展望
+
+  prompt: |
+    根据提供的新闻素材撰写正文，参考以下结构（可根据内容灵活调整）...
+
+footer:
+  content: |
+    本文内容仅供参考，不构成投资建议。
 ```
 
 ## 🎨 自定义文章类型
@@ -268,15 +294,26 @@ wechat-editor-bot/
 ├── pyproject.toml               # 项目配置和依赖
 ├── uv.lock                      # 依赖锁定文件
 ├── modules/                     # 核心模块
+│   ├── bot/                     # 机器人核心模块
+│   │   ├── config.py            # 配置管理和服务工厂
+│   │   ├── commands.py          # 命令实现
+│   │   ├── pipeline.py          # 工作流管道
+│   │   └── mock_data.py         # Mock 数据
+│   ├── cli/                     # 命令行模块
+│   │   ├── parser.py            # CLI 参数解析
+│   │   └── dispatcher.py        # 命令分发器
 │   ├── exa_news_gatherer.py     # Exa 新闻采集
 │   ├── article_generator.py     # AI 文章生成
 │   ├── weather_service.py       # 天气服务
 │   ├── image_generator.py       # 封面图生成
 │   ├── wechat_publisher.py      # 微信 API 集成
+│   ├── markdown_converter.py    # Markdown 到 HTML 转换
 │   ├── file_manager.py          # 文件管理
-│   └── cache_manager.py         # 缓存管理（模块化执行）
+│   ├── cache_manager.py         # 缓存管理（模块化执行）
+│   └── news_gatherer.py         # 新闻采集接口
 ├── config/
 │   ├── wechat_bot_config.yaml   # 主配置文件
+│   ├── article_templates.yaml   # 模板配置索引
 │   ├── templates/               # 文章模板配置
 │   │   ├── financial_report.yaml
 │   │   ├── tech_news.yaml
@@ -547,6 +584,7 @@ python wechat_editor_bot.py clean [选项]
 - [安装指南](docs/INSTALL.md)
 - [配置指南](docs/CONFIG_GUIDE.md)
 - [样式指南](docs/STYLE_GUIDE.md)
+- [缓存管理指南](docs/CACHE_GUIDE.md)
 
 ## 🤝 贡献
 
