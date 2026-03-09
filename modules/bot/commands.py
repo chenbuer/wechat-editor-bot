@@ -137,11 +137,9 @@ class BotCommands:
                 data = json.load(f)
                 news_items = [NewsItem(**item) for item in data.get('news', [])]
         else:
-            # 从缓存加载
-            news_data = self.cache_manager.load_news(date_str)
-            if news_data:
-                news_items = [NewsItem(**item) for item in news_data]
-            else:
+            # 从缓存加载（load_news 现在返回 NewsItem 对象列表）
+            news_items = self.cache_manager.load_news(date_str) or []
+            if not news_items:
                 logger.info("未找到新闻缓存，将生成不依赖新闻的文章")
 
         logger.info(f"文章类型: {article_type}")

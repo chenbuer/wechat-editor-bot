@@ -9,9 +9,12 @@ import json
 import logging
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, TYPE_CHECKING, Union
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from modules.news_gatherer import NewsItem
 
 
 class CacheManager:
@@ -41,28 +44,37 @@ class CacheManager:
         """
         return self.cache_dir / f"{date_str}_{cache_type}.json"
 
-    def save_news(self, date_str: str, news_items: List[Dict]) -> Path:
+    def save_news(self, date_str: str, news_items: List[Any]) -> Path:
         """
         保存新闻数据
 
         Args:
             date_str: 日期字符串
-            news_items: 新闻列表
+            news_items: 新闻列表（NewsItem 对象或字典）
 
         Returns:
             缓存文件路径
         """
         cache_path = self._get_cache_path(date_str, "news")
+
+        # Helper function to extract fields from either NewsItem objects or dicts
+        def get_field(item, field: str, default=''):
+            if hasattr(item, field):
+                return getattr(item, field)
+            elif isinstance(item, dict):
+                return item.get(field, default)
+            return default
+
         data = {
             "date": date_str,
             "count": len(news_items),
             "timestamp": datetime.now().isoformat(),
             "news": [
                 {
-                    "title": item['title'],
-                    "source": item['source'],
-                    "summary": item['summary'],
-                    "url": item['url']
+                    "title": get_field(item, 'title'),
+                    "source": get_field(item, 'source'),
+                    "summary": get_field(item, 'summary'),
+                    "url": get_field(item, 'url')
                 }
                 for item in news_items
             ]
@@ -72,7 +84,7 @@ class CacheManager:
         logger.info(f"✅ 新闻缓存已保存: {cache_path} ({len(news_items)} 条)")
         return cache_path
 
-    def load_news(self, date_str: str) -> Optional[List[Dict]]:
+    def load_news(self, date_str: str) -> Optional[List[Any]]:
         """
         加载新闻数据
 
@@ -80,7 +92,7 @@ class CacheManager:
             date_str: 日期字符串
 
         Returns:
-            新闻列表，如果不存在返回 None
+            新闻列表（NewsItem 对象），如果不存在返回 None
         """
         cache_path = self._get_cache_path(date_str, "news")
         if not cache_path.exists():
@@ -89,8 +101,22 @@ class CacheManager:
 
         with open(cache_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+
+        # Import NewsItem and convert dicts to NewsItem objects
+        from modules.news_gatherer import NewsItem
+
+        news_items = [
+            NewsItem(
+                title=item['title'],
+                source=item['source'],
+                summary=item['summary'],
+                url=item.get('url', '')
+            )
+            for item in data['news']
+        ]
+
         logger.info(f"✅ 新闻缓存已加载: {cache_path} ({data['count']} 条)")
-        return data['news']
+        return news_items
 
     def save_article_meta(self, date_str: str, article_type: str,
                          md_path: str, title: str, topic: Optional[str] = None) -> Path:

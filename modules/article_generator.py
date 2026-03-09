@@ -207,6 +207,7 @@ class ArticleGenerator:
         # 如果 title_formats 为空字符串，使用 bullet 格式（知识解读类）
         # 否则使用 numbered 格式（新闻类）
         title_formats = template.get('title_formats')
+
         if title_formats == "":
             # 简化素材格式，作为引子
             news_list = "\n\n".join([
