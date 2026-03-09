@@ -125,6 +125,9 @@ class ArticleGenerator:
 
         # 根据 provider 调用不同的 API
         try:
+            # 打印 prompt 到日志
+            logger.info(f"=== AI Prompt ===\n{prompt}\n{'='*40}")
+
             if self.ai_provider == "openai":
                 article_content = self._call_openai_api(prompt)
             elif self.ai_provider == "anthropic":
@@ -192,24 +195,38 @@ class ArticleGenerator:
                      article_type: str = 'financial_report',
                      custom_topic: str = None) -> str:
         """构建 AI 提示词"""
-        news_list = "\n\n".join([
-            f"【{i+1}】{item['title']}\n来源：{item['source']}\n摘要：{item['summary']}"
-            for i, item in enumerate(news_items)
-        ])
 
-        date_formatted = datetime.strptime(date_str, '%Y%m%d').strftime('%Y年%m月%d日')
-
-        # 获取模板
+        # 获取模板配置
         template = self._get_template(article_type)
         if not template:
             logger.warning(f"未找到文章类型 {article_type} 的模板，使用默认模板")
             template = self._get_template('financial_report')
 
+        # 根据模板配置决定素材呈现格式
+        # 如果 title_formats 为空字符串，使用 bullet 格式（知识解读类）
+        # 否则使用 numbered 格式（新闻类）
+        title_formats = template.get('title_formats')
+        if title_formats == "":
+            # 简化素材格式，作为引子
+            news_list = "\n\n".join([
+                f"• {item.summary}"
+                for item in news_items
+            ])
+            news_list = f"**当前热点引子（仅供参考，用于触发主题联想）：**\n\n{news_list}"
+        else:
+            # 默认：编号列表格式
+            news_list = "\n\n".join([
+                f"【{i+1}】{item.title}\n来源：{item.source}\n摘要：{item.summary}"
+                for i, item in enumerate(news_items)
+            ])
+
+        date_formatted = datetime.strptime(date_str, '%Y%m%d').strftime('%Y年%m月%d日')
+
         # 根据模板配置决定是否生成标题
         title = self._format_title(date_str, article_type)
 
         return self._build_prompt_from_template(
-            template, date_formatted, news_list, title, date_str, custom_topic
+            template, date_formatted, news_list, title, date_str, custom_topic, article_type
         )
 
     def _post_process(self, content: str, date_str: str, article_type: str = 'financial_report') -> str:
@@ -349,18 +366,28 @@ class ArticleGenerator:
         # 构建提示词
         topic_info = f"\n\n**解读主题：** {custom_topic}" if custom_topic else ""
 
-        prompt = f"""你是一位资深记者和内容创作者，擅长撰写生动有趣的{article_name}。
+        # 从配置文件读取 prompt 开头
+        prompt_intro = self.templates.get('prompt_intro', '你是一位资深记者和内容创作者，擅长撰写生动有趣的{article_name}。')
+        prompt_intro = prompt_intro.replace('{article_name}', article_name)
+
+        prompt = f"""{prompt_intro}
 
 今天是 {date_formatted}，请根据以下新闻素材，撰写一篇{article_name}。{topic_info}
 
 **新闻素材：**
 {news_list}
 
-**重要说明：**
-- 只能使用上述提供的新闻素材，不要添加任何未提供的新闻
-- 如果新闻中没有提供具体数据（如指数点位、涨跌幅），不要编造，可以使用描述性词汇如上涨、下跌等
+"""
+
+        # 使用通用重要说明（从 common_requirements 生成）
+        authenticity = common_reqs.get('authenticity', '')
+        data_handling = common_reqs.get('data_handling', '')
+        compliance = common_reqs.get('compliance', '')
+        prompt += f"""**重要说明：**
+- {authenticity}
+- {data_handling}
 - 如果新闻素材不足以填充某个章节，可以省略该章节或简化处理
-- 保持真实性，不要杜撰任何数据或新闻
+- {compliance}
 
 **文章结构：**
 

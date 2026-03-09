@@ -184,7 +184,7 @@ class WeChatPublisher:
             # 调用 markdown_converter 模块转换
             from .markdown_converter import convert_markdown_to_html
 
-            html_content = convert_markdown_to_html(temp_md_path, output_file=None, theme=theme)
+            html_content = convert_markdown_to_html(temp_md_path, output_file=None, theme=theme, silent=True)
 
             # 使用 premailer 将 CSS 内联化
             from premailer import Premailer

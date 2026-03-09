@@ -340,7 +340,7 @@ img {{
 """
 
 
-def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme='fresh'):
+def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme='fresh', silent=False):
     """
     将 Markdown 文件转换为微信公众号 HTML
 
@@ -349,6 +349,7 @@ def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme=
         output_file: 输出 HTML 文件路径（可选）
         title: HTML 标题（可选，默认使用文件名）
         theme: 主题名称 (fresh/ocean/warm)
+        silent: 静默模式，不打印 HTML 内容到控制台
 
     Returns:
         生成的 HTML 内容
@@ -436,7 +437,8 @@ def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme=
         except Exception as e:
             print(f"错误：写入文件失败 - {e}")
             sys.exit(1)
-    else:
+    elif not silent:
+        # 只有在非静默模式下才打印 HTML
         print(html_template)
 
     return html_template
