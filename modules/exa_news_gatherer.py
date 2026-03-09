@@ -8,11 +8,14 @@ Exa API 新闻采集模块
 import logging
 import json
 import requests
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, TYPE_CHECKING
 from datetime import datetime, timedelta
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from modules.news_gatherer import NewsItem
 
 
 class ExaNewsGatherer:
@@ -48,7 +51,7 @@ class ExaNewsGatherer:
         logger.info(f"ExaNewsGatherer 初始化完成 (query: {self.query[:50]}...)")
         logger.info(f"缓存文件: {self.cache_file.name}")
 
-    def gather_news(self, date_str: str) -> List[Dict]:
+    def gather_news(self, date_str: str) -> List:
         """
         单次 API 调用获取所有新闻
 
@@ -56,7 +59,7 @@ class ExaNewsGatherer:
             date_str: 日期字符串 (YYYYMMDD)
 
         Returns:
-            新闻列表，每条新闻包含 title, source, summary, url
+            新闻列表（NewsItem 对象）
         """
         logger.info(f"开始从 Exa 采集新闻: {date_str}")
 
@@ -167,7 +170,7 @@ class ExaNewsGatherer:
 
         return start_iso, end_iso
 
-    def _filter_results(self, results: List[Dict]) -> List[Dict]:
+    def _filter_results(self, results: List[Dict]) -> List:
         """
         客户端过滤结果
 
@@ -175,8 +178,10 @@ class ExaNewsGatherer:
             results: Exa API 返回的原始结果
 
         Returns:
-            过滤后的新闻列表
+            过滤后的新闻列表（NewsItem 对象）
         """
+        from modules.news_gatherer import NewsItem
+
         filtered = []
 
         for item in results:
@@ -205,13 +210,13 @@ class ExaNewsGatherer:
             # 提取来源（从 URL 域名）
             source = self._extract_source(url)
 
-            # 构建新闻条目
-            news_item = {
-                'title': title,
-                'source': source,
-                'summary': content_summary,
-                'url': url
-            }
+            # 构建 NewsItem 对象
+            news_item = NewsItem(
+                title=title,
+                source=source,
+                summary=content_summary,
+                url=url
+            )
 
             filtered.append(news_item)
 
@@ -264,12 +269,22 @@ class ExaNewsGatherer:
         except Exception:
             return False
 
-    def _load_cache(self) -> List[Dict]:
-        """加载缓存的搜索结果"""
+    def _load_cache(self) -> List:
+        """加载缓存的搜索结果（返回 NewsItem 对象）"""
+        from modules.news_gatherer import NewsItem
         try:
             with open(self.cache_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                return data.get('results', [])
+                # 将字典转换为 NewsItem 对象
+                return [
+                    NewsItem(
+                        title=item.get('title', ''),
+                        source=item.get('source', ''),
+                        summary=item.get('summary', ''),
+                        url=item.get('url', '')
+                    )
+                    for item in data.get('results', [])
+                ]
         except Exception as e:
             logger.error(f"加载缓存失败: {e}")
             return []
