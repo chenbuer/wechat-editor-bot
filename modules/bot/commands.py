@@ -224,7 +224,9 @@ class BotCommands:
         article_html = self.wechat_publisher.convert_to_wechat_html(article_md, theme=theme)
 
         # 保存 HTML
-        article_type = self.config['article'].get('article_type', 'financial_report')
+        # 从缓存读取 article_type，确保与生成的文章类型一致
+        article_meta = self.cache_manager.load_article_meta(date_str)
+        article_type = article_meta.get('article_type') if article_meta else self.config['article'].get('article_type', 'financial_report')
         html_path = self.file_manager.save_article(article_html, date_str, 'html', article_type)
 
         # 保存元数据到缓存

@@ -69,7 +69,7 @@ class FileManager:
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
 
-        logger.info(f"文章已保存: {file_path}")
+        logger.debug(f"文章已保存: {file_path}")
         return str(file_path)
 
     def save_image(self, image_data: bytes, date_str: str, image_type: str = 'primary') -> str:

@@ -17,12 +17,15 @@ from modules.cli.parser import create_parser
 from modules.cli.dispatcher import CommandDispatcher
 
 # 配置日志
+logs_dir = Path(__file__).parent / 'logs'
+logs_dir.mkdir(exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('wechat_editor_bot.log', encoding='utf-8')
+        logging.FileHandler(logs_dir / 'wechat_editor_bot.log', encoding='utf-8')
     ]
 )
 

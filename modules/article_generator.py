@@ -139,6 +139,7 @@ class ArticleGenerator:
             article_content = self._post_process(article_content, date_str, article_type)
 
             logger.info(f"文章生成成功 (provider: {self.ai_provider})，长度: {len(article_content)} 字符")
+            logger.debug(f"文章内容预览:\n{article_content[:500]}...")
             return article_content
 
         except Exception as e:
@@ -356,7 +357,7 @@ class ArticleGenerator:
 
     def _build_prompt_from_template(self, template: Dict, date_formatted: str,
                                     news_list: str, title: Optional[str], date_str: str,
-                                    custom_topic: str = None) -> str:
+                                    custom_topic: str = None, article_type: str = 'financial_report') -> str:
         """根据模板构建提示词"""
         article_name = template.get('name', '文章')
         summary_config = template.get('summary', {})
@@ -389,7 +390,9 @@ class ArticleGenerator:
 - 如果新闻素材不足以填充某个章节，可以省略该章节或简化处理
 - {compliance}
 
-**文章结构：**
+"""
+
+        prompt += """**文章结构：**
 
 """
 

@@ -143,10 +143,10 @@ class WorkflowPipeline:
                 logger.info("\n[步骤 6-7/7] 跳过微信上传（Mock 模式）")
                 logger.info("\n" + "=" * 60)
                 logger.info("✅ Mock 模式运行成功")
-                logger.info(f"文章: {md_path}")
-                logger.info(f"HTML: {html_path}")
-                logger.info(f"主图: {image_path}")
-                logger.info(f"次图: {secondary_image_path}")
+                logger.debug(f"文章: {md_path}")
+                logger.debug(f"HTML: {html_path}")
+                logger.debug(f"主图: {image_path}")
+                logger.debug(f"次图: {secondary_image_path}")
                 logger.info("=" * 60)
 
             # 9. 清理旧文件

@@ -384,20 +384,46 @@ def convert_markdown_to_html(markdown_file, output_file=None, title=None, theme=
     md = markdown.Markdown(extensions=extensions)
     content_html = md.convert(md_content)
 
-    # 移除 footer 相关的 HTML 注释
-    import re
-    content_html = re.sub(r'<!--\s*/?footer\s*-->', '', content_html)
-
     # 使用 BeautifulSoup 处理特殊样式
     from bs4 import BeautifulSoup
+    import re
     soup = BeautifulSoup(content_html, 'html.parser')
 
-    # 处理 footer - 查找包含"本文内容仅供参考"的段落
-    all_p_tags = soup.find_all('p')
-    for p in all_p_tags:
-        if '本文内容仅供参考' in p.get_text():
-            p['class'] = 'footer-text'
+    # 处理 footer - 使用注释标记定位 footer 区域
+    # 查找 <!-- footer --> 注释后的段落
+    from bs4 import Comment
+
+    # 先查找并处理 footer 注释
+    footer_found = False
+    comments = soup.find_all(string=lambda text: isinstance(text, Comment))
+    for comment in comments:
+        comment_str = str(comment)
+        if 'footer' in comment_str:
+            footer_found = True
+            # 找到注释后的第一个 p 标签
+            next_p = comment.find_next('p')
+            if next_p:
+                next_p['class'] = 'footer-text'
             break
+
+    # 如果没有找到注释标记，使用关键词匹配作为备用方案
+    if not footer_found:
+        footer_keywords = ['本文内容仅供参考', '本文内容仅供学习参考', '关注我们']
+        all_p_tags = soup.find_all('p')
+        for p in all_p_tags:
+            p_text = p.get_text()
+            if any(keyword in p_text for keyword in footer_keywords):
+                # 检查是否包含多个关键词，确保是 footer
+                match_count = sum(1 for kw in footer_keywords if kw in p_text)
+                if match_count >= 1:
+                    p['class'] = 'footer-text'
+                    break
+
+    # 移除 footer 相关的 HTML 注释
+    comments = soup.find_all(string=lambda text: isinstance(text, Comment))
+    for comment in comments:
+        if 'footer' in str(comment):
+            comment.extract()
 
     content_html = str(soup)
 
