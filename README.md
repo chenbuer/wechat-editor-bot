@@ -16,6 +16,7 @@
 - 🗂️ **文件自动管理** - 30 天自动归档，保持目录整洁
 - 🎨 **精美排版** - 编者按卡片样式，小字免责声明，支持多种主题
 - ⚙️ **高度可配置** - 文章类型、新闻源、样式主题均可自定义
+- 🔧 **模块化执行** - 支持单独执行各个步骤，失败后可从断点继续
 
 ## 📚 支持的文章类型
 
@@ -86,6 +87,8 @@ wechat:
 
 ### 运行
 
+#### 完整流程（一键运行）
+
 ```bash
 # Mock 模式测试（不消耗 API 配额）
 uv run python wechat_editor_bot.py --mock
@@ -104,6 +107,64 @@ uv run python wechat_editor_bot.py --article-type knowledge_explanation --topic 
 
 # 自定义配置文件
 uv run python wechat_editor_bot.py --config custom_config.yaml --secrets custom_secrets.yaml
+```
+
+#### 模块化执行（单独运行各步骤）
+
+系统支持将完整流程拆分为独立步骤，失败后可从断点继续：
+
+```bash
+# 1. 搜索新闻
+uv run python wechat_editor_bot.py search --article-type financial_report --time-range 48
+
+# 2. 生成文章（从缓存读取新闻）
+uv run python wechat_editor_bot.py generate
+
+# 3. 转换为微信 HTML
+uv run python wechat_editor_bot.py convert --theme warm
+
+# 4. 获取天气信息
+uv run python wechat_editor_bot.py weather --location Beijing
+
+# 5. 生成封面图片
+uv run python wechat_editor_bot.py image
+
+# 6. 上传到微信
+uv run python wechat_editor_bot.py upload
+
+# 查看当前状态
+uv run python wechat_editor_bot.py status
+
+# 清理缓存
+uv run python wechat_editor_bot.py clean --keep-days 7
+```
+
+**模块化执行的优势：**
+- ✅ 失败后可从断点继续，无需重新运行
+- ✅ 可以手动编辑中间结果（如修改文章后再转换）
+- ✅ 方便调试和测试单个模块
+- ✅ 灵活组合不同功能
+
+**使用场景示例：**
+
+```bash
+# 场景1：搜索失败后重试
+uv run python wechat_editor_bot.py search --article-type tech_news --num-results 100
+# 成功后继续
+uv run python wechat_editor_bot.py generate
+
+# 场景2：手动编辑文章后继续
+uv run python wechat_editor_bot.py search
+uv run python wechat_editor_bot.py generate
+# 手动编辑 output/20260309_financial_report.md
+uv run python wechat_editor_bot.py convert --input output/20260309_financial_report.md
+uv run python wechat_editor_bot.py weather
+uv run python wechat_editor_bot.py image
+uv run python wechat_editor_bot.py upload
+
+# 场景3：只生成图片（已有天气数据）
+uv run python wechat_editor_bot.py weather
+uv run python wechat_editor_bot.py image
 ```
 
 ## 📖 配置文件说明
@@ -212,10 +273,15 @@ wechat-editor-bot/
 │   ├── weather_service.py       # 天气服务
 │   ├── image_generator.py       # 封面图生成
 │   ├── wechat_publisher.py      # 微信 API 集成
-│   └── file_manager.py          # 文件管理
+│   ├── file_manager.py          # 文件管理
+│   └── cache_manager.py         # 缓存管理（模块化执行）
 ├── config/
 │   ├── wechat_bot_config.yaml   # 主配置文件
-│   ├── article_templates.yaml   # 文章模板配置
+│   ├── templates/               # 文章模板配置
+│   │   ├── financial_report.yaml
+│   │   ├── tech_news.yaml
+│   │   ├── general_news.yaml
+│   │   └── knowledge_explanation.yaml
 │   ├── secrets.yaml             # 敏感配置（不提交）
 │   └── secrets.yaml.example     # 配置模板
 ├── output/                      # 输出目录
@@ -223,6 +289,12 @@ wechat-editor-bot/
 │   ├── html/                    # 微信 HTML
 │   ├── images/                  # 封面图片
 │   └── archive/                 # 归档（30天+）
+├── .cache/                      # 缓存目录（模块化执行）
+│   ├── 20260309_news.json       # 新闻数据
+│   ├── 20260309_article.json    # 文章元数据
+│   ├── 20260309_weather.json    # 天气数据
+│   ├── 20260309_images.json     # 图片元数据
+│   └── 20260309_html.json       # HTML 元数据
 ├── tests/                       # 测试文件
 ├── .github/workflows/           # GitHub Actions
 │   ├── test-news-bot.yml        # CI 测试
@@ -315,6 +387,37 @@ crontab -e
 
 ## 🔧 故障排查
 
+### 模块化执行相关
+
+**查看当前状态：**
+```bash
+uv run python wechat_editor_bot.py status
+```
+
+**从失败步骤继续：**
+```bash
+# 如果 generate 步骤失败，修复后重新运行
+uv run python wechat_editor_bot.py generate
+
+# 继续后续步骤
+uv run python wechat_editor_bot.py convert
+uv run python wechat_editor_bot.py weather
+uv run python wechat_editor_bot.py image
+uv run python wechat_editor_bot.py upload
+```
+
+**清理缓存：**
+```bash
+# 清理所有缓存
+uv run python wechat_editor_bot.py clean
+
+# 清理指定日期
+uv run python wechat_editor_bot.py clean --date 20260309
+
+# 保留最近 7 天
+uv run python wechat_editor_bot.py clean --keep-days 7
+```
+
 ### 图片生成失败
 
 ```bash
@@ -344,9 +447,100 @@ tail -f wechat_editor_bot.log
 
 ### 文章质量不佳
 
-- 调整 `config/article_templates.yaml` 中的模板配置
+- 调整 `config/templates/` 中的模板配置
 - 修改 `modules/article_generator.py` 中的提示词
 - 调整新闻搜索的 `num_results` 获取更多新闻源
+
+## 📚 命令行参数详解
+
+### 完整流程命令
+
+```bash
+python wechat_editor_bot.py [选项]
+```
+
+**选项：**
+- `--config FILE` - 配置文件路径（默认：config/wechat_bot_config.yaml）
+- `--secrets FILE` - Secrets 文件路径（默认：config/secrets.yaml）
+- `--mock` - Mock 模式（不调用真实 API）
+- `--article-type TYPE` - 文章类型（financial_report/tech_news/general_news/knowledge_explanation）
+- `--topic TEXT` - 自定义主题（用于知识解读类文章）
+
+### 模块化命令
+
+#### search - 搜索新闻
+```bash
+python wechat_editor_bot.py search [选项]
+```
+- `--article-type TYPE` - 文章类型
+- `--topic TEXT` - 自定义主题
+- `--date DATE` - 日期（格式：20260309）
+- `--time-range HOURS` - 时间范围（小时，如 24、48、168）
+- `--num-results NUM` - 结果数量
+- `--enable-search` - 强制启用搜索（用于默认不搜索的类型）
+- `--output FILE` - 输出文件路径
+
+#### generate - 生成文章
+```bash
+python wechat_editor_bot.py generate [选项]
+```
+- `--news-file FILE` - 新闻数据文件（默认从缓存读取）
+- `--article-type TYPE` - 文章类型
+- `--topic TEXT` - 自定义主题
+- `--date DATE` - 日期
+- `--output FILE` - 输出文件路径
+
+#### convert - 转换为微信 HTML
+```bash
+python wechat_editor_bot.py convert [选项]
+```
+- `--input FILE` - 输入 Markdown 文件（默认从缓存读取）
+- `--theme THEME` - 主题样式（warm/cool/professional）
+- `--date DATE` - 日期
+- `--output FILE` - 输出文件路径
+
+#### weather - 获取天气信息
+```bash
+python wechat_editor_bot.py weather [选项]
+```
+- `--location LOCATION` - 位置（如 Beijing、Nanjing）
+- `--date DATE` - 日期
+- `--output FILE` - 输出文件路径
+
+#### image - 生成封面图片
+```bash
+python wechat_editor_bot.py image [选项]
+```
+- `--weather-file FILE` - 天气数据文件（默认从缓存读取）
+- `--date DATE` - 日期
+- `--output-dir DIR` - 输出目录
+
+#### upload - 上传到微信
+```bash
+python wechat_editor_bot.py upload [选项]
+```
+- `--html FILE` - HTML 文件
+- `--image FILE` - 主图文件
+- `--secondary-image FILE` - 次图文件
+- `--title TEXT` - 文章标题
+- `--markdown FILE` - Markdown 文件（用于提取标题）
+- `--date DATE` - 日期
+- `--no-create-draft` - 不创建草稿（只上传图片）
+
+#### status - 查看状态
+```bash
+python wechat_editor_bot.py status [选项]
+```
+- `--date DATE` - 日期（默认今天）
+
+#### clean - 清理缓存
+```bash
+python wechat_editor_bot.py clean [选项]
+```
+- `--date DATE` - 清理指定日期的缓存
+- `--keep-days NUM` - 保留最近 N 天的文件
+- `--cache-only` - 只清理缓存
+- `--output-only` - 只清理输出文件
 
 ## 📚 文档
 

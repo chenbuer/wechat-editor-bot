@@ -11,6 +11,9 @@ output/images/*
 output/archive/*
 output/*.json
 
+# workflow cache
+.cache
+
 # Keep directory structure
 !output/articles/.gitkeep
 !output/html/.gitkeep
