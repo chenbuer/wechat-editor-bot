@@ -7,6 +7,7 @@ template_files:
   tech_news: "templates/tech_news.yaml"
   general_news: "templates/general_news.yaml"
   knowledge_explanation: "templates/knowledge_explanation.yaml"
+  news_flash: "templates/news_flash.yaml"
 
 # 通用写作要求（适用于所有模板）
 common_requirements:

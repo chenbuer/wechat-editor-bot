@@ -491,8 +491,21 @@ class ArticleGenerator:
             return None
 
         # 如果查询中包含 {topic} 占位符，替换为实际主题
-        if custom_topic and 'query' in config:
-            config['query'] = config['query'].replace('{topic}', custom_topic)
-            logger.info(f"替换主题占位符: {custom_topic}")
+        if 'query' in config and '{topic}' in config['query']:
+            if custom_topic:
+                config['query'] = config['query'].replace('{topic}', custom_topic)
+                logger.info(f"替换主题占位符: {custom_topic}")
+            else:
+                # 根据文章类型使用默认主题
+                default_topics = {
+                    'financial_report': '财经',
+                    'tech_news': '科技',
+                    'general_news': '热点',
+                    'news_flash': '突发',
+                    'knowledge_explanation': '知识'
+                }
+                default_topic = default_topics.get(article_type, '热点')
+                config['query'] = config['query'].replace('{topic}', default_topic)
+                logger.info(f"使用默认主题: {default_topic}")
 
         return config

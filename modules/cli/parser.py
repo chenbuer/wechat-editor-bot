@@ -88,7 +88,7 @@ def _add_search_subcommand(subparsers):
     """添加 search 子命令"""
     parser_search = subparsers.add_parser('search', help='搜索新闻')
     parser_search.add_argument('--article-type', help='文章类型')
-    parser_search.add_argument('--topic', help='自定义主题')
+    parser_search.add_argument('--topic', help='搜索主题（替换模板中的 {topic} 占位符）')
     parser_search.add_argument('--date', help='日期（格式：20260309）')
     parser_search.add_argument('--time-range', type=int, help='时间范围（小时）')
     parser_search.add_argument('--num-results', type=int, help='结果数量')

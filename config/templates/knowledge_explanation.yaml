@@ -6,12 +6,12 @@ title_formats: ""
 
 # 新闻搜索配置
 news_search:
-  enabled: true  # 知识解读默认不需要实时新闻
-  # 如果需要案例参考，可以设置为 true 并配置 query
-  # query: "{topic} 最新新闻 案例 分析"
-  # num_results: 20
-  # use_autoprompt: true
-  # time_range: 168  # 7天 = 168小时
+  enabled: true
+  query: "{topic} 知识解读 背景 分析 案例"
+  num_results: 20
+  use_autoprompt: false
+  search_type: "keyword"
+  time_range: 168  # 7天 = 168小时
 
 summary:
   title: "🎯 核心要点"

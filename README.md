@@ -24,6 +24,7 @@
 2. **科技资讯** (`tech_news`) - 产品发布、技术突破、行业动态
 3. **通用新闻摘要** (`general_news`) - 任意主题的新闻汇总
 4. **知识解读** (`knowledge_explanation`) - 解释经济名词、历史事件等
+5. **新闻快讯** (`news_flash`) - 短小精悍的快速新闻摘要（500-800字）
 
 ## 🚀 快速开始
 
@@ -104,6 +105,15 @@ uv run python wechat_editor_bot.py --article-type general_news
 
 # 生成知识解读（需要指定主题）
 uv run python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"
+
+# 生成新闻快讯（短小精悍）
+uv run python wechat_editor_bot.py --article-type news_flash
+
+# 使用自定义主题搜索
+uv run python wechat_editor_bot.py search --article-type news_flash --topic "特朗普 伊朗"
+
+# 不指定主题（使用模板默认值）
+uv run python wechat_editor_bot.py search --article-type news_flash
 
 # 自定义配置文件
 uv run python wechat_editor_bot.py --config custom_config.yaml --secrets custom_secrets.yaml
@@ -216,6 +226,7 @@ template_files:
   tech_news: "templates/tech_news.yaml"
   general_news: "templates/general_news.yaml"
   knowledge_explanation: "templates/knowledge_explanation.yaml"
+  news_flash: "templates/news_flash.yaml"
 
 # 通用写作要求（适用于所有模板）
 common_requirements:
@@ -248,7 +259,8 @@ news_search:
   enabled: true
   query: "最新财经新闻 股市行情 A股港股美股指数"
   num_results: 50
-  use_autoprompt: true
+  use_autoprompt: false  # 禁用自动优化，避免查询偏移
+  search_type: "keyword"  # 搜索类型：keyword（精确）/ neural（语义）/ auto（自动）
   include_domains: []
   exclude_keywords:
     - "加密货币"
@@ -500,8 +512,8 @@ python wechat_editor_bot.py [选项]
 - `--config FILE` - 配置文件路径（默认：config/wechat_bot_config.yaml）
 - `--secrets FILE` - Secrets 文件路径（默认：config/secrets.yaml）
 - `--mock` - Mock 模式（不调用真实 API）
-- `--article-type TYPE` - 文章类型（financial_report/tech_news/general_news/knowledge_explanation）
-- `--topic TEXT` - 自定义主题（用于知识解读类文章）
+- `--article-type TYPE` - 文章类型（financial_report/tech_news/general_news/knowledge_explanation/news_flash）
+- `--topic TEXT` - 搜索主题（替换模板中的 {topic} 占位符）
 
 ### 模块化命令
 
@@ -510,7 +522,7 @@ python wechat_editor_bot.py [选项]
 python wechat_editor_bot.py search [选项]
 ```
 - `--article-type TYPE` - 文章类型
-- `--topic TEXT` - 自定义主题
+- `--topic TEXT` - 搜索主题（替换模板中的 {topic} 占位符）
 - `--date DATE` - 日期（格式：20260309）
 - `--time-range HOURS` - 时间范围（小时，如 24、48、168）
 - `--num-results NUM` - 结果数量
@@ -578,6 +590,57 @@ python wechat_editor_bot.py clean [选项]
 - `--keep-days NUM` - 保留最近 N 天的文件
 - `--cache-only` - 只清理缓存
 - `--output-only` - 只清理输出文件
+
+## 🎯 搜索参数详解
+
+### `--topic` 参数说明
+
+`--topic` 参数用于自定义搜索主题，会替换模板中的 `{topic}` 占位符。
+
+**各文章类型的默认主题：**
+
+| 文章类型 | 默认主题 | 模板配置 |
+|----------|----------|----------|
+| `financial_report` | 财经 | `"{topic} 财经新闻 股市行情 经济数据 宏观政策"` |
+| `tech_news` | 科技 | `"{topic} 科技新闻 人工智能 芯片 新产品发布"` |
+| `general_news` | 热点 | `"{topic} 最新新闻 热点事件 重要动态"` |
+| `news_flash` | 突发 | `"{topic} 最新 突发 新闻 快讯"` |
+| `knowledge_explanation` | 知识 | `"{topic} 知识解读 背景 分析 案例"` |
+
+**使用场景：**
+
+```bash
+# 指定主题搜索
+uv run python wechat_editor_bot.py search --article-type news_flash --topic "科技"
+# 实际搜索：科技 最新 突发 新闻 快讯
+
+# 不指定主题（使用默认值）
+uv run python wechat_editor_bot.py search --article-type news_flash
+# 实际搜索：突发 最新 突发 新闻 快讯
+
+# 多词主题
+uv run python wechat_editor_bot.py search --article-type news_flash --topic "特朗普 伊朗"
+# 实际搜索：特朗普 伊朗 最新 突发 新闻 快讯
+```
+
+### Exa 搜索模式
+
+Exa API 支持多种搜索模式，通过模板中的 `search_type` 配置：
+
+| 模式 | 特点 | 适用场景 |
+|------|------|----------|
+| `keyword` | 精确匹配关键词 | 主题明确、需要精准结果 |
+| `neural` | 语义理解搜索 | 主题模糊、探索性搜索 |
+| `auto` | 自动选择最佳模式 | 通用场景 |
+
+**配置示例：**
+
+```yaml
+# config/templates/news_flash.yaml
+news_search:
+  search_type: "keyword"  # 使用精确关键词搜索
+  use_autoprompt: false   # 禁用自动优化，避免查询偏移
+```
 
 ## 📚 文档
 

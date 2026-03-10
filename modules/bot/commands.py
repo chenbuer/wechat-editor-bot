@@ -49,7 +49,7 @@ class BotCommands:
 
         Args:
             article_type: 文章类型
-            topic: 自定义主题
+            topic: 搜索主题（替换模板中的 {topic} 占位符）
             date_str: 日期字符串
             time_range: 时间范围（小时）
             num_results: 结果数量
@@ -88,7 +88,7 @@ class BotCommands:
 
         logger.info(f"文章类型: {article_type}")
         if topic:
-            logger.info(f"自定义主题: {topic}")
+            logger.info(f"搜索主题: {topic}")
         logger.info(f"日期: {date_str}")
         logger.info(f"时间范围: {search_config.get('time_range')} 小时")
         logger.info(f"结果数量: {search_config.get('num_results')}")

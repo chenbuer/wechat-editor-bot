@@ -10,9 +10,10 @@ title_formats:
 # 新闻搜索配置
 news_search:
   enabled: true
-  query: "最新财经新闻 股市行情 A股港股美股指数 经济数据指标 宏观政策 国际经济动态"
+  query: "{topic} 财经新闻 股市行情 经济数据 宏观政策"
   num_results: 50
-  use_autoprompt: true
+  use_autoprompt: false  # 禁用自动优化
+  search_type: "keyword"  # 使用关键词搜索
   include_domains: []
   exclude_keywords:
     - "加密货币"

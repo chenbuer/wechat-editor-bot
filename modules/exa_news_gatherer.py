@@ -36,7 +36,10 @@ class ExaNewsGatherer:
         # 从配置中读取参数
         self.query = search_config.get('query', '最新新闻')
         self.num_results = search_config.get('num_results', 50)
-        self.use_autoprompt = search_config.get('use_autoprompt', True)
+        # 默认禁用 autoprompt，避免查询偏移
+        self.use_autoprompt = search_config.get('use_autoprompt', False)
+        # 使用 keyword 模式获得更精确的结果
+        self.search_type = search_config.get('search_type', 'keyword')
         self.include_domains = search_config.get('include_domains', [])
         self.exclude_keywords = search_config.get('exclude_keywords', [])
         self.time_range = search_config.get('time_range', 24)  # 小时数
@@ -111,7 +114,7 @@ class ExaNewsGatherer:
         payload = {
             "query": query,
             "num_results": num_results,
-            "type": "neural",
+            "type": self.search_type,  # 使用配置的搜索类型
             "use_autoprompt": use_autoprompt,
             "start_published_date": start_date,
             "end_published_date": end_date,
