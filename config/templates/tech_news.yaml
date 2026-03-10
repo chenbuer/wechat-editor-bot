@@ -7,15 +7,15 @@ title_formats: ""
 # 新闻搜索配置
 news_search:
   enabled: true
-  query: "{topic} 科技新闻 人工智能 芯片 新产品发布"
-  num_results: 30
-  use_autoprompt: false  # 禁用自动优化
-  search_type: "keyword"  # 使用关键词搜索
+  query: "{topic} 科技创新 数字经济 产业动态"
+  num_results: 50
+  use_autoprompt: true  # 启用自动优化
+  search_type: "auto"  # 自动选择最佳搜索模式
   include_domains: []
   exclude_keywords:
     - "加密货币"
     - "赌博"
-  time_range: 24
+  time_range: 48
 
 summary:
   title: "💡 今日看点"

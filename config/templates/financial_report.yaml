@@ -10,10 +10,10 @@ title_formats:
 # 新闻搜索配置
 news_search:
   enabled: true
-  query: "{topic} 财经新闻 股市行情 经济数据 宏观政策"
-  num_results: 50
-  use_autoprompt: false  # 禁用自动优化
-  search_type: "keyword"  # 使用关键词搜索
+  query: "{topic} 中美财经新闻 宏观经济 金融市场 政策解读 国际形势 美股 地缘政治"
+  num_results: 100
+  use_autoprompt: true  # 启用自动优化，提升搜索效果
+  search_type: "auto"  # 自动选择最佳搜索模式
   include_domains: []
   exclude_keywords:
     - "加密货币"

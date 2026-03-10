@@ -7,13 +7,13 @@ title_formats: ""
 # 新闻搜索配置
 news_search:
   enabled: true
-  query: "{topic} 最新 突发 新闻 快讯"
-  num_results: 20
-  use_autoprompt: false  # 禁用自动优化，避免查询偏移
-  search_type: "keyword"  # 使用关键词搜索，更精确
+  query: "{topic} 突发新闻 重大事件"
+  num_results: 50
+  use_autoprompt: true  # 启用自动优化
+  search_type: "auto"  # 自动选择最佳搜索模式
   include_domains: []
   exclude_keywords: []
-  time_range: 6
+  time_range: 12
 
 summary:
   title: "⚡️ 快讯摘要"
