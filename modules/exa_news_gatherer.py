@@ -289,12 +289,22 @@ class ExaNewsGatherer:
             logger.error(f"加载缓存失败: {e}")
             return []
 
-    def _save_cache(self, results: List[Dict]):
+    def _save_cache(self, results: List):
         """保存搜索结果到缓存"""
         try:
+            # 将 NewsItem 对象转换为字典
+            results_dict = [
+                {
+                    'title': item.title,
+                    'source': item.source,
+                    'summary': item.summary,
+                    'url': item.url
+                }
+                for item in results
+            ]
             cache_data = {
                 'timestamp': datetime.now().isoformat(),
-                'results': results
+                'results': results_dict
             }
             with open(self.cache_file, 'w', encoding='utf-8') as f:
                 json.dump(cache_data, f, ensure_ascii=False, indent=2)
