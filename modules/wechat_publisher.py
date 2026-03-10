@@ -115,11 +115,21 @@ class WeChatPublisher:
         access_token = self.get_access_token()
         url = f"https://api.weixin.qq.com/cgi-bin/draft/add?access_token={access_token}"
 
+        # 检查标题长度（微信限制 64 字符）
+        if len(title) > 64:
+            logger.warning(f"标题过长 ({len(title)} 字符)，截断到 64 字符")
+            title = title[:64]
+
         # content_html 已经是微信格式（仅 body 内容）
         # 生成摘要
         digest = self._generate_digest(content_html)
-        logger.info(f"摘要长度: {len(digest)} 字符")
+        logger.info(f"摘要长度: {len(digest)} 字符, {len(digest.encode('utf-8'))} 字节")
         logger.debug(f"摘要内容: {digest}")
+
+        # 如果摘要为空，使用默认摘要
+        if not digest or digest.strip() == "":
+            digest = "财经日报，每日更新"
+            logger.warning("摘要为空，使用默认摘要")
 
         articles = [{
             "title": title,
