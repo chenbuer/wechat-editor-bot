@@ -1,7 +1,7 @@
 [project]
 name = "wechat-editor-bot"
-version = "1.0.0"
-description = "自动化财经新闻采集、文章生成和微信公众号发布系统"
+version = "2.0.0"
+description = "自动化新闻采集、各类文章生成和微信公众号发布系统"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
