@@ -82,6 +82,11 @@ def _add_common_arguments(parser: argparse.ArgumentParser):
         '--topic',
         help='自定义主题（用于知识解读类文章）'
     )
+    parser.add_argument(
+        '--time-range',
+        type=int,
+        help='新闻搜索时间范围（小时），覆盖配置文件中的设置'
+    )
 
 
 def _add_search_subcommand(subparsers):

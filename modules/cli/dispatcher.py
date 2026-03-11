@@ -89,4 +89,8 @@ class CommandDispatcher:
             )
         else:
             # 无子命令，执行完整流程
-            self.pipeline.run(article_type=args.article_type, custom_topic=args.topic)
+            self.pipeline.run(
+                article_type=args.article_type,
+                custom_topic=args.topic,
+                time_range=args.time_range
+            )

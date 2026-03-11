@@ -22,7 +22,7 @@ news_search:
   time_range: 24
 
 summary:
-  title: "📝 编者按"
+  title: ""
   style: "quote"  # 使用引用格式
   prompt: "用 2-3 句话概括今日市场核心要点，语气轻松但专业。"
 

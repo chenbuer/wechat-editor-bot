@@ -421,8 +421,22 @@ cleanup:
 ```bash
 crontab -e
 
-# 每天 7:00 运行（财经日报）
-0 7 * * * cd /path/to/wechat-editor-bot && uv run python wechat_editor_bot.py --article-type financial_report >> logs/cron.log 2>&1
+# 周一早上 8:00 - 72小时（涵盖周末）
+0 8 * * 1 cd /path/to/wechat-editor-bot && uv run python wechat_editor_bot.py --time-range 72 >> logs/cron.log 2>&1
+
+# 周二到周五早上 8:00 - 使用默认24小时
+0 8 * * 2-5 cd /path/to/wechat-editor-bot && uv run python wechat_editor_bot.py >> logs/cron.log 2>&1
+```
+
+**Crontab 时间字段说明：**
+```
+┌───────────── 分钟 (0 - 59)
+│ ┌───────────── 小时 (0 - 23)
+│ │ ┌───────────── 日 (1 - 31)
+│ │ │ ┌───────────── 月 (1 - 12)
+│ │ │ │ ┌───────────── 星期 (0 - 7，0和7都是周日)
+│ │ │ │ │
+* * * * * 要执行的命令
 ```
 
 ## 💰 成本估算
@@ -502,94 +516,173 @@ tail -f wechat_editor_bot.log
 
 ## 📚 命令行参数详解
 
-### 完整流程命令
+### 参数分类说明
+
+命令行参数分为两类：
+
+| 类型 | 说明 | 示例 |
+|------|------|------|
+| **全局参数** | 用于完整流程，无子命令时生效 | `python wechat_editor_bot.py --article-type tech_news` |
+| **子命令参数** | 需要先指定子命令，只对该子命令生效 | `python wechat_editor_bot.py search --time-range 72` |
+
+---
+
+### 全局参数（完整流程）
+
+不指定子命令时，执行完整流程（搜索 → 生成 → 转换 → 天气 → 图片 → 上传）。
 
 ```bash
-python wechat_editor_bot.py [选项]
+python wechat_editor_bot.py [全局参数]
 ```
 
-**选项：**
-- `--config FILE` - 配置文件路径（默认：config/wechat_bot_config.yaml）
-- `--secrets FILE` - Secrets 文件路径（默认：config/secrets.yaml）
-- `--mock` - Mock 模式（不调用真实 API）
-- `--article-type TYPE` - 文章类型（financial_report/tech_news/general_news/knowledge_explanation/news_flash）
-- `--topic TEXT` - 搜索主题（替换模板中的 {topic} 占位符）
+**全局参数：**
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--config FILE` | 配置文件路径 | config/wechat_bot_config.yaml |
+| `--secrets FILE` | Secrets 文件路径 | config/secrets.yaml |
+| `--mock` | Mock 模式（不调用真实 API） | - |
+| `--article-type TYPE` | 文章类型 | financial_report |
+| `--topic TEXT` | 搜索主题（替换模板中的 {topic} 占位符） | - |
+| `--time-range HOURS` | 新闻搜索时间范围（小时），覆盖配置文件中的设置 | 使用配置文件值 |
 
-### 模块化命令
+**完整流程示例：**
+```bash
+# 使用默认配置（财经日报，24小时）
+python wechat_editor_bot.py
+
+# 指定文章类型
+python wechat_editor_bot.py --article-type tech_news
+
+# 覆盖时间范围为72小时（如周一涵盖周末）
+python wechat_editor_bot.py --time-range 72
+
+# 组合使用
+python wechat_editor_bot.py --article-type financial_report --time-range 72
+```
+
+---
+
+### 子命令参数（模块化执行）
 
 #### search - 搜索新闻
 ```bash
-python wechat_editor_bot.py search [选项]
+python wechat_editor_bot.py search [子命令参数]
 ```
-- `--article-type TYPE` - 文章类型
-- `--topic TEXT` - 搜索主题（替换模板中的 {topic} 占位符）
-- `--date DATE` - 日期（格式：20260309）
-- `--time-range HOURS` - 时间范围（小时，如 24、48、168）
-- `--num-results NUM` - 结果数量
-- `--enable-search` - 强制启用搜索（用于默认不搜索的类型）
-- `--output FILE` - 输出文件路径
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--article-type TYPE` | 文章类型 |
+| `--topic TEXT` | 搜索主题（替换模板中的 {topic} 占位符） |
+| `--date DATE` | 日期（格式：20260309） |
+| `--time-range HOURS` | 时间范围（小时，如 24、48、168） |
+| `--num-results NUM` | 结果数量 |
+| `--enable-search` | 强制启用搜索（用于默认不搜索的类型） |
+| `--output FILE` | 输出文件路径 |
+
+---
 
 #### generate - 生成文章
 ```bash
-python wechat_editor_bot.py generate [选项]
+python wechat_editor_bot.py generate [子命令参数]
 ```
-- `--news-file FILE` - 新闻数据文件（默认从缓存读取）
-- `--article-type TYPE` - 文章类型
-- `--topic TEXT` - 自定义主题
-- `--date DATE` - 日期
-- `--output FILE` - 输出文件路径
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--news-file FILE` | 新闻数据文件（默认从缓存读取） |
+| `--article-type TYPE` | 文章类型 |
+| `--topic TEXT` | 自定义主题 |
+| `--date DATE` | 日期 |
+| `--output FILE` | 输出文件路径 |
+
+---
 
 #### convert - 转换为微信 HTML
 ```bash
-python wechat_editor_bot.py convert [选项]
+python wechat_editor_bot.py convert [子命令参数]
 ```
-- `--input FILE` - 输入 Markdown 文件（默认从缓存读取）
-- `--theme THEME` - 主题样式（warm/cool/professional）
-- `--date DATE` - 日期
-- `--output FILE` - 输出文件路径
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--input FILE` | 输入 Markdown 文件（默认从缓存读取） |
+| `--theme THEME` | 主题样式（warm/cool/professional） |
+| `--date DATE` | 日期 |
+| `--output FILE` | 输出文件路径 |
+
+---
 
 #### weather - 获取天气信息
 ```bash
-python wechat_editor_bot.py weather [选项]
+python wechat_editor_bot.py weather [子命令参数]
 ```
-- `--location LOCATION` - 位置（如 Beijing、Nanjing）
-- `--date DATE` - 日期
-- `--output FILE` - 输出文件路径
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--location LOCATION` | 位置（如 Beijing、Nanjing） |
+| `--date DATE` | 日期 |
+| `--output FILE` | 输出文件路径 |
+
+---
 
 #### image - 生成封面图片
 ```bash
-python wechat_editor_bot.py image [选项]
+python wechat_editor_bot.py image [子命令参数]
 ```
-- `--weather-file FILE` - 天气数据文件（默认从缓存读取）
-- `--date DATE` - 日期
-- `--output-dir DIR` - 输出目录
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--weather-file FILE` | 天气数据文件（默认从缓存读取） |
+| `--date DATE` | 日期 |
+| `--output-dir DIR` | 输出目录 |
+
+---
 
 #### upload - 上传到微信
 ```bash
-python wechat_editor_bot.py upload [选项]
+python wechat_editor_bot.py upload [子命令参数]
 ```
-- `--html FILE` - HTML 文件
-- `--image FILE` - 主图文件
-- `--secondary-image FILE` - 次图文件
-- `--title TEXT` - 文章标题
-- `--markdown FILE` - Markdown 文件（用于提取标题）
-- `--date DATE` - 日期
-- `--no-create-draft` - 不创建草稿（只上传图片）
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--html FILE` | HTML 文件 |
+| `--image FILE` | 主图文件 |
+| `--secondary-image FILE` | 次图文件 |
+| `--title TEXT` | 文章标题 |
+| `--markdown FILE` | Markdown 文件（用于提取标题） |
+| `--date DATE` | 日期 |
+| `--no-create-draft` | 不创建草稿（只上传图片） |
+
+---
 
 #### status - 查看状态
 ```bash
-python wechat_editor_bot.py status [选项]
+python wechat_editor_bot.py status [子命令参数]
 ```
-- `--date DATE` - 日期（默认今天）
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--date DATE` | 日期（默认今天） |
+
+---
 
 #### clean - 清理缓存
 ```bash
-python wechat_editor_bot.py clean [选项]
+python wechat_editor_bot.py clean [子命令参数]
 ```
-- `--date DATE` - 清理指定日期的缓存
-- `--keep-days NUM` - 保留最近 N 天的文件
-- `--cache-only` - 只清理缓存
-- `--output-only` - 只清理输出文件
+
+**子命令参数：**
+| 参数 | 说明 |
+|------|------|
+| `--date DATE` | 清理指定日期的缓存 |
+| `--keep-days NUM` | 保留最近 N 天的文件 |
+| `--cache-only` | 只清理缓存 |
+| `--output-only` | 只清理输出文件 |
 
 ## 🎯 搜索参数详解
 

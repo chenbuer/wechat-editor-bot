@@ -32,13 +32,14 @@ class WorkflowPipeline:
         self.config = services.config
         self.mock_mode = services.mock_mode
 
-    def run(self, article_type: Optional[str] = None, custom_topic: Optional[str] = None):
+    def run(self, article_type: Optional[str] = None, custom_topic: Optional[str] = None, time_range: Optional[int] = None):
         """
         运行完整流程
 
         Args:
             article_type: 文章类型（如不指定则使用配置中的默认值）
             custom_topic: 自定义主题（用于知识解读类文章）
+            time_range: 新闻搜索时间范围（小时），覆盖配置文件中的设置
         """
         # 确定文章类型
         article_type = article_type or self.config['article'].get('article_type', 'financial_report')
@@ -49,6 +50,8 @@ class WorkflowPipeline:
         logger.info(f"文章类型: {article_type}")
         if custom_topic:
             logger.info(f"自定义主题: {custom_topic}")
+        if time_range is not None:
+            logger.info(f"时间范围: {time_range} 小时（命令行覆盖）")
         logger.info("=" * 60)
 
         date_str = datetime.now().strftime('%Y%m%d')
@@ -56,6 +59,11 @@ class WorkflowPipeline:
         try:
             # 1. 获取新闻搜索配置
             search_config = self.services.article_generator.get_news_search_config(article_type, custom_topic)
+
+            # 如果命令行指定了 time_range，覆盖配置文件中的值
+            if search_config and time_range is not None:
+                search_config['time_range'] = time_range
+                logger.info(f"时间范围已覆盖为: {time_range} 小时")
 
             # 2. 如果需要搜索新闻，则采集新闻
             news_items = []
