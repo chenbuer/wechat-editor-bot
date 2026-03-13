@@ -319,37 +319,28 @@ class BotCommands:
             cover_image = mock_data.create_mock_cover_image(
                 date_str, weather_data, self.config['image']['primary_size']
             )
-            secondary_image = mock_data.create_mock_secondary_image(
-                date_str, self.config['image']['secondary_size']
-            )
             logger.info("Mock 模式: 使用默认图片")
         else:
             cover_image = self.image_generator.generate_cover_image(
                 weather_data, size=self.config['image']['primary_size']
             )
-            secondary_image = self.image_generator.generate_cover_image(
-                weather_data, size=self.config['image']['secondary_size']
-            )
 
         # 保存图片
         image_path = self.file_manager.save_image(cover_image, date_str, 'primary')
-        secondary_image_path = self.file_manager.save_image(secondary_image, date_str, 'secondary')
 
         # 保存元数据到缓存
-        self.cache_manager.save_images_meta(date_str, str(image_path), str(secondary_image_path))
+        self.cache_manager.save_images_meta(date_str, str(image_path), None)
 
         logger.info("=" * 60)
         logger.info(f"✅ 图片生成完成")
-        logger.info(f"主图: {image_path}")
-        logger.info(f"次图: {secondary_image_path}")
+        logger.info(f"封面图: {image_path}")
         logger.info("=" * 60)
 
         return {
-            'primary': str(image_path),
-            'secondary': str(secondary_image_path)
+            'primary': str(image_path)
         }
 
-    def upload(self, html_file: str = None, image_file: str = None, secondary_image_file: str = None,
+    def upload(self, html_file: str = None, image_file: str = None,
                title: str = None, markdown_file: str = None, date_str: str = None,
                create_draft: bool = True) -> str:
         """
@@ -357,8 +348,7 @@ class BotCommands:
 
         Args:
             html_file: HTML 文件
-            image_file: 主图文件
-            secondary_image_file: 次图文件
+            image_file: 封面图文件
             title: 文章标题
             markdown_file: Markdown 文件（用于提取标题）
             date_str: 日期字符串
@@ -384,11 +374,10 @@ class BotCommands:
             if html_meta:
                 html_file = html_meta.get('html_path')
 
-        if not image_file or not secondary_image_file:
+        if not image_file:
             images_meta = self.cache_manager.load_images_meta(date_str)
             if images_meta:
                 image_file = image_file or images_meta.get('primary_path')
-                secondary_image_file = secondary_image_file or images_meta.get('secondary_path')
 
         # 检查文件
         if not html_file or not Path(html_file).exists():
@@ -396,12 +385,8 @@ class BotCommands:
             raise FileNotFoundError(f"HTML 文件不存在: {html_file}")
 
         if not image_file or not Path(image_file).exists():
-            logger.error(f"主图文件不存在: {image_file}")
-            raise FileNotFoundError(f"主图文件不存在: {image_file}")
-
-        if not secondary_image_file or not Path(secondary_image_file).exists():
-            logger.error(f"次图文件不存在: {secondary_image_file}")
-            raise FileNotFoundError(f"次图文件不存在: {secondary_image_file}")
+            logger.error(f"封面图文件不存在: {image_file}")
+            raise FileNotFoundError(f"封面图文件不存在: {image_file}")
 
         # 读取 HTML
         with open(html_file, 'r', encoding='utf-8') as f:
@@ -421,24 +406,20 @@ class BotCommands:
 
         logger.info(f"标题: {title}")
         logger.info(f"HTML: {html_file}")
-        logger.info(f"主图: {image_file}")
-        logger.info(f"次图: {secondary_image_file}")
+        logger.info(f"封面图: {image_file}")
 
         # 上传图片
-        logger.info("上传主图...")
+        logger.info("上传封面图...")
         media_id = self.wechat_publisher.upload_image(image_file)
-
-        logger.info("上传次图...")
-        secondary_media_id = self.wechat_publisher.upload_image(secondary_image_file)
 
         # 更新缓存
         images_meta = self.cache_manager.load_images_meta(date_str) or {}
         self.cache_manager.save_images_meta(
             date_str,
             images_meta.get('primary_path', image_file),
-            images_meta.get('secondary_path', secondary_image_file),
+            None,
             media_id,
-            secondary_media_id
+            None
         )
 
         # 创建草稿
@@ -446,7 +427,7 @@ class BotCommands:
         if create_draft:
             logger.info("创建草稿...")
             draft_media_id = self.wechat_publisher.create_draft(
-                title, article_html, media_id, secondary_media_id
+                title, article_html, media_id
             )
 
             logger.info("=" * 60)
@@ -456,8 +437,7 @@ class BotCommands:
         else:
             logger.info("=" * 60)
             logger.info(f"✅ 图片上传完成")
-            logger.info(f"主图 media_id: {media_id}")
-            logger.info(f"次图 media_id: {secondary_media_id}")
+            logger.info(f"封面图 media_id: {media_id}")
             logger.info("=" * 60)
 
         return draft_media_id
@@ -508,8 +488,7 @@ class BotCommands:
             elif key == 'html' and status['steps'][key]:
                 logger.info(f"   └─ 文件: {status.get('html_path', 'N/A')}")
             elif key == 'images' and status['steps'][key]:
-                logger.info(f"   └─ 主图: {status.get('primary_image', 'N/A')}")
-                logger.info(f"   └─ 次图: {status.get('secondary_image', 'N/A')}")
+                logger.info(f"   └─ 封面图: {status.get('primary_image', 'N/A')}")
                 if status.get('uploaded'):
                     logger.info(f"   └─ 已上传到微信")
 

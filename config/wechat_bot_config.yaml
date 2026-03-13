@@ -14,7 +14,6 @@ article:
 # 图片生成配置
 image:
   primary_size: "3000x1276"
-  secondary_size: "2000x2000"
   style: "oil_painting"
   mood: "relaxing"
 

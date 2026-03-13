@@ -140,8 +140,7 @@ def _add_upload_subcommand(subparsers):
     """添加 upload 子命令"""
     parser_upload = subparsers.add_parser('upload', help='上传到微信')
     parser_upload.add_argument('--html', help='HTML 文件')
-    parser_upload.add_argument('--image', help='主图文件')
-    parser_upload.add_argument('--secondary-image', help='次图文件')
+    parser_upload.add_argument('--image', help='封面图文件')
     parser_upload.add_argument('--title', help='文章标题')
     parser_upload.add_argument('--markdown', help='Markdown 文件（用于提取标题）')
     parser_upload.add_argument('--date', help='日期（格式：20260309）')

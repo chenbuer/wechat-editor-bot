@@ -96,8 +96,7 @@ class WeChatPublisher:
 
         return media_id
 
-    def create_draft(self, title: str, content_html: str, cover_media_id: str,
-                     secondary_media_id: str = None) -> str:
+    def create_draft(self, title: str, content_html: str, cover_media_id: str) -> str:
         """
         创建草稿
 
@@ -105,7 +104,6 @@ class WeChatPublisher:
             title: 文章标题
             content_html: 文章 HTML 内容
             cover_media_id: 封面图片 media_id
-            secondary_media_id: 次图 media_id（可选）
 
         Returns:
             draft_media_id
@@ -144,11 +142,6 @@ class WeChatPublisher:
         # 如果配置了 author，则添加
         if self.author:
             articles[0]["author"] = self.author
-
-        # 如果有次图，则添加
-        if secondary_media_id:
-            articles[0]["thumb_media_id"] = secondary_media_id
-            logger.info(f"使用次图: {self._mask_media_id(secondary_media_id)}")
 
         payload = {"articles": articles}
 

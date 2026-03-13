@@ -110,37 +110,29 @@ class WorkflowPipeline:
                 cover_image = mock_data.create_mock_cover_image(
                     date_str, weather_data, self.config['image']['primary_size']
                 )
-                secondary_image = mock_data.create_mock_secondary_image(
-                    date_str, self.config['image']['secondary_size']
-                )
             else:
                 cover_image = self.services.image_generator.generate_cover_image(
                     weather_data, size=self.config['image']['primary_size']
                 )
-                secondary_image = self.services.image_generator.generate_cover_image(
-                    weather_data, size=self.config['image']['secondary_size']
-                )
 
             image_path = self.services.file_manager.save_image(cover_image, date_str, 'primary')
-            secondary_image_path = self.services.file_manager.save_image(secondary_image, date_str, 'secondary')
-            self.services.cache_manager.save_images_meta(date_str, str(image_path), str(secondary_image_path))
+            self.services.cache_manager.save_images_meta(date_str, str(image_path), None)
 
             # 7. 上传到微信
             if not self.mock_mode and self.config['wechat']['create_draft']:
                 logger.info("\n[步骤 6/7] 上传到微信")
                 media_id = self.services.wechat_publisher.upload_image(image_path)
-                secondary_media_id = self.services.wechat_publisher.upload_image(secondary_image_path)
 
                 # 更新缓存
                 self.services.cache_manager.save_images_meta(
-                    date_str, str(image_path), str(secondary_image_path),
-                    media_id, secondary_media_id
+                    date_str, str(image_path), None,
+                    media_id, None
                 )
 
                 # 8. 创建草稿
                 logger.info("\n[步骤 7/7] 创建草稿")
                 draft_media_id = self.services.wechat_publisher.create_draft(
-                    title, article_html, media_id, secondary_media_id
+                    title, article_html, media_id
                 )
 
                 logger.info("\n" + "=" * 60)
@@ -153,8 +145,7 @@ class WorkflowPipeline:
                 logger.info("✅ Mock 模式运行成功")
                 logger.debug(f"文章: {md_path}")
                 logger.debug(f"HTML: {html_path}")
-                logger.debug(f"主图: {image_path}")
-                logger.debug(f"次图: {secondary_image_path}")
+                logger.debug(f"封面图: {image_path}")
                 logger.info("=" * 60)
 
             # 9. 清理旧文件

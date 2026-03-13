@@ -193,7 +193,6 @@ article:
 
 image:
   primary_size: "3000x1276"
-  secondary_size: "2000x2000"
   style: "oil_painting"
   mood: "relaxing"
 
@@ -369,7 +368,6 @@ article:
 
 image:
   primary_size: "3000x1276"
-  secondary_size: "2000x2000"
   style: "oil_painting"
   mood: "relaxing"
 
@@ -650,8 +648,7 @@ python wechat_editor_bot.py upload [子命令参数]
 | 参数 | 说明 |
 |------|------|
 | `--html FILE` | HTML 文件 |
-| `--image FILE` | 主图文件 |
-| `--secondary-image FILE` | 次图文件 |
+| `--image FILE` | 封面图文件 |
 | `--title TEXT` | 文章标题 |
 | `--markdown FILE` | Markdown 文件（用于提取标题） |
 | `--date DATE` | 日期 |

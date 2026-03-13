@@ -82,29 +82,3 @@ def create_mock_cover_image(date_str: str, weather_data: Dict, size: str = "900x
     return buffer.getvalue()
 
 
-def create_mock_secondary_image(date_str: str, size: str = "500x500") -> bytes:
-    """
-    创建 Mock 次图
-
-    Args:
-        date_str: 日期字符串
-        size: 图片尺寸（格式：宽x高）
-
-    Returns:
-        图片二进制数据
-    """
-    # 解析尺寸
-    width, height = map(int, size.split('x'))
-
-    # 创建图片
-    img = Image.new('RGB', (width, height), color=(109, 137, 73))
-    d = ImageDraw.Draw(img)
-
-    # 添加文本
-    text = f"Mock Secondary\n{date_str}"
-    d.text((width // 2, height // 2), text, fill=(255, 255, 255), anchor="mm")
-
-    # 转换为字节
-    buffer = BytesIO()
-    img.save(buffer, format='JPEG', quality=85)
-    return buffer.getvalue()

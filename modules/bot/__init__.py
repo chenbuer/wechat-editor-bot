@@ -11,8 +11,7 @@ from .pipeline import WorkflowPipeline
 from .mock_data import (
     create_mock_news_items,
     create_mock_weather_data,
-    create_mock_cover_image,
-    create_mock_secondary_image
+    create_mock_cover_image
 )
 
 __all__ = [
@@ -23,5 +22,4 @@ __all__ = [
     'create_mock_news_items',
     'create_mock_weather_data',
     'create_mock_cover_image',
-    'create_mock_secondary_image',
 ]
