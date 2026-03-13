@@ -64,10 +64,10 @@
 ```json
 {
   "date": "20260309",
-  "primary_path": "output/images/20260309_primary.jpg",
-  "secondary_path": "output/images/20260309_secondary.jpg",
-  "primary_media_id": "media_id_1",
-  "secondary_media_id": "media_id_2"
+  "primary_path": "output/images/cover-20260309-primary.jpg",
+  "secondary_path": null,
+  "media_id": "media_id_1",
+  "secondary_media_id": null
 }
 ```
 
@@ -225,7 +225,7 @@ python wechat_editor_bot.py convert --input output/articles/20260309_financial_r
 ```bash
 # 只运行某个步骤进行调试
 python wechat_editor_bot.py search --time-range 168 --num-results 100
-python wechat_editor_bot.py generate --article-type tech_news
+python wechat_editor_bot.py generate --article-type knowledge_explanation --topic "量化宽松"
 ```
 
 ## 故障排除

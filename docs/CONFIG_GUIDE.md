@@ -11,7 +11,7 @@
 定义模板文件路径和通用写作要求。
 
 ### 3. `config/templates/*.yaml` - 文章模板详情
-每种文章类型有独立的模板文件（financial_report.yaml、tech_news.yaml 等）。
+每种文章类型有独立的模板文件（financial_report.yaml、knowledge_explanation.yaml）。
 
 ### 4. `config/secrets.yaml` - 敏感配置
 包含 API 密钥、AppID 等敏感信息，**不应提交到 Git**（已在 .gitignore 中）。
@@ -32,7 +32,6 @@ article:
 # 图片生成配置
 image:
   primary_size: "3000x1276"
-  secondary_size: "2000x2000"
   style: "oil_painting"
   mood: "relaxing"
 
@@ -61,8 +60,6 @@ cleanup:
 # 模板文件路径配置
 template_files:
   financial_report: "templates/financial_report.yaml"
-  tech_news: "templates/tech_news.yaml"
-  general_news: "templates/general_news.yaml"
   knowledge_explanation: "templates/knowledge_explanation.yaml"
 
 # 通用写作要求（适用于所有模板）
@@ -129,7 +126,7 @@ footer:
     关注我们，获取更多财经资讯。
 ```
 
-其他文章类型模板（tech_news.yaml、general_news.yaml、knowledge_explanation.yaml）结构类似，具体内容请查看 [docs/article_templates_usage.md](article_templates_usage.md)。
+其他文章类型模板（knowledge_explanation.yaml）结构类似，具体内容请查看 [docs/article_templates_usage.md](article_templates_usage.md)。
 
 ### secrets.yaml
 
@@ -161,8 +158,6 @@ wechat:
 ### 文章类型 (article_type)
 
 - `financial_report` - 财经日报
-- `tech_news` - 科技资讯
-- `general_news` - 通用新闻摘要
 - `knowledge_explanation` - 知识解读
 
 ### 标题格式 (title_formats)
@@ -198,8 +193,7 @@ title_formats: ""
 
 ### 图片配置 (image)
 
-- `primary_size` - 主图尺寸（如 "3000x1276"）
-- `secondary_size` - 次图尺寸（如 "2000x2000"）
+- `primary_size` - 封面图尺寸（如 "3000x1276"）
 - `style` - 图片风格（如 "oil_painting"）
 - `mood` - 图片氛围（如 "relaxing"）
 
@@ -231,7 +225,6 @@ title_formats: ""
 
 3. **标题格式选择**
    - 财经日报：使用时段格式，区分早报/速递/日报
-   - 科技资讯：使用 AI 生成，更贴合内容
    - 知识解读：使用 AI 生成，更具吸引力
 
 4. **测试流程**

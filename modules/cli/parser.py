@@ -24,7 +24,7 @@ def create_parser() -> argparse.ArgumentParser:
 完整流程（默认）：
   python wechat_editor_bot.py                                    # 生产模式（默认文章类型）
   python wechat_editor_bot.py --mock                             # Mock 模式（测试）
-  python wechat_editor_bot.py --article-type tech_news           # 生成科技资讯
+  python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"
 
 模块化执行：
   python wechat_editor_bot.py search --article-type financial_report --time-range 48
@@ -76,7 +76,7 @@ def _add_common_arguments(parser: argparse.ArgumentParser):
     )
     parser.add_argument(
         '--article-type',
-        help='文章类型（financial_report, tech_news, general_news, knowledge_explanation）'
+        help='文章类型（financial_report, knowledge_explanation）'
     )
     parser.add_argument(
         '--topic',

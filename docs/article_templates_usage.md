@@ -29,17 +29,7 @@ article:
 - **结构**：编者按 + 新闻速递 + 市场表现 + 市场展望
 - **适用场景**：股市行情、经济数据、政策动态
 
-### 2. tech_news（科技资讯）
-- **用途**：科技领域新闻报道
-- **结构**：今日看点 + 重磅新闻 + 产品与技术 + 行业动态 + 趋势观察
-- **适用场景**：产品发布、技术突破、行业动态
-
-### 3. general_news（通用新闻摘要）
-- **用途**：任意主题的新闻汇总
-- **结构**：今日要闻 + 核心新闻 + 深度解读 + 相关影响
-- **适用场景**：综合新闻、跨领域资讯
-
-### 4. knowledge_explanation（知识解读）
+### 2. knowledge_explanation（知识解读）
 - **用途**：解释经济名词、历史事件等
 - **结构**：核心要点 + 背景介绍 + 核心概念 + 实际案例 + 当前影响
 - **适用场景**：热点解读、知识科普
@@ -68,18 +58,12 @@ article = generator.generate_article(
 ### 指定文章类型
 
 ```python
-# 生成科技资讯
+# 生成知识解读（需要指定主题）
 article = generator.generate_article(
     news_items=news_list,
     date_str="20260306",
-    article_type="tech_news"
-)
-
-# 生成通用新闻摘要
-article = generator.generate_article(
-    news_items=news_list,
-    date_str="20260306",
-    article_type="general_news"
+    article_type="knowledge_explanation",
+    custom_topic="量化宽松"
 )
 ```
 
@@ -101,7 +85,7 @@ article = generator.generate_article(
 # 获取所有支持的文章类型
 available_types = generator.get_available_article_types()
 print(available_types)
-# 输出: ['financial_report', 'tech_news', 'general_news', 'knowledge_explanation']
+# 输出: ['financial_report', 'knowledge_explanation']
 ```
 
 ## 自定义模板
@@ -234,24 +218,4 @@ A: 不需要。模板配置在每次生成文章时动态加载。
 
 本文内容仅供参考，不构成投资建议。投资有风险，入市需谨慎。
 关注我们，获取更多财经资讯。
-```
-
-### 科技资讯示例
-
-```markdown
-# 科技速递 | 20260306
-
-> ## 💡 今日看点
->
-> 2026年3月6日，科技领域迎来多项重磅消息...
-
----
-
-## 一、重磅新闻
-...
-
----
-
-本文内容仅供参考，不代表投资建议。
-关注我们，获取更多科技资讯。
 ```

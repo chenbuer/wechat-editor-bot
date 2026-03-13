@@ -21,10 +21,7 @@
 ## 📚 支持的文章类型
 
 1. **财经日报** (`financial_report`) - 股市行情、经济数据、政策动态
-2. **科技资讯** (`tech_news`) - 产品发布、技术突破、行业动态
-3. **通用新闻摘要** (`general_news`) - 任意主题的新闻汇总
-4. **知识解读** (`knowledge_explanation`) - 解释经济名词、历史事件等
-5. **新闻快讯** (`news_flash`) - 短小精悍的快速新闻摘要（500-800字）
+2. **知识解读** (`knowledge_explanation`) - 解释经济名词、历史事件等
 
 ## 🚀 快速开始
 
@@ -97,23 +94,8 @@ uv run python wechat_editor_bot.py --mock
 # 生产模式（使用默认文章类型：财经日报）
 uv run python wechat_editor_bot.py
 
-# 生成科技资讯
-uv run python wechat_editor_bot.py --article-type tech_news
-
-# 生成通用新闻摘要
-uv run python wechat_editor_bot.py --article-type general_news
-
 # 生成知识解读（需要指定主题）
 uv run python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"
-
-# 生成新闻快讯（短小精悍）
-uv run python wechat_editor_bot.py --article-type news_flash
-
-# 使用自定义主题搜索
-uv run python wechat_editor_bot.py search --article-type news_flash --topic "特朗普 伊朗"
-
-# 不指定主题（使用模板默认值）
-uv run python wechat_editor_bot.py search --article-type news_flash
 
 # 自定义配置文件
 uv run python wechat_editor_bot.py --config custom_config.yaml --secrets custom_secrets.yaml
@@ -159,7 +141,7 @@ uv run python wechat_editor_bot.py clean --keep-days 7
 
 ```bash
 # 场景1：搜索失败后重试
-uv run python wechat_editor_bot.py search --article-type tech_news --num-results 100
+uv run python wechat_editor_bot.py search --article-type financial_report --num-results 100
 # 成功后继续
 uv run python wechat_editor_bot.py generate
 
@@ -222,10 +204,7 @@ cleanup:
 # 模板文件路径配置
 template_files:
   financial_report: "templates/financial_report.yaml"
-  tech_news: "templates/tech_news.yaml"
-  general_news: "templates/general_news.yaml"
   knowledge_explanation: "templates/knowledge_explanation.yaml"
-  news_flash: "templates/news_flash.yaml"
 
 # 通用写作要求（适用于所有模板）
 common_requirements:
@@ -327,8 +306,6 @@ wechat-editor-bot/
 │   ├── article_templates.yaml   # 模板配置索引
 │   ├── templates/               # 文章模板配置
 │   │   ├── financial_report.yaml
-│   │   ├── tech_news.yaml
-│   │   ├── general_news.yaml
 │   │   └── knowledge_explanation.yaml
 │   ├── secrets.yaml             # 敏感配置（不提交）
 │   └── secrets.yaml.example     # 配置模板
@@ -520,7 +497,7 @@ tail -f wechat_editor_bot.log
 
 | 类型 | 说明 | 示例 |
 |------|------|------|
-| **全局参数** | 用于完整流程，无子命令时生效 | `python wechat_editor_bot.py --article-type tech_news` |
+| **全局参数** | 用于完整流程，无子命令时生效 | `python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"` |
 | **子命令参数** | 需要先指定子命令，只对该子命令生效 | `python wechat_editor_bot.py search --time-range 72` |
 
 ---
@@ -548,8 +525,8 @@ python wechat_editor_bot.py [全局参数]
 # 使用默认配置（财经日报，24小时）
 python wechat_editor_bot.py
 
-# 指定文章类型
-python wechat_editor_bot.py --article-type tech_news
+# 生成知识解读（需要指定主题）
+python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"
 
 # 覆盖时间范围为72小时（如周一涵盖周末）
 python wechat_editor_bot.py --time-range 72
@@ -692,25 +669,14 @@ python wechat_editor_bot.py clean [子命令参数]
 | 文章类型 | 默认主题 | 模板配置 |
 |----------|----------|----------|
 | `financial_report` | 财经 | `"{topic} 财经新闻 股市行情 经济数据 宏观政策"` |
-| `tech_news` | 科技 | `"{topic} 科技新闻 人工智能 芯片 新产品发布"` |
-| `general_news` | 热点 | `"{topic} 最新新闻 热点事件 重要动态"` |
-| `news_flash` | 突发 | `"{topic} 最新 突发 新闻 快讯"` |
 | `knowledge_explanation` | 知识 | `"{topic} 知识解读 背景 分析 案例"` |
 
 **使用场景：**
 
 ```bash
-# 指定主题搜索
-uv run python wechat_editor_bot.py search --article-type news_flash --topic "科技"
-# 实际搜索：科技 最新 突发 新闻 快讯
-
-# 不指定主题（使用默认值）
-uv run python wechat_editor_bot.py search --article-type news_flash
-# 实际搜索：突发 最新 突发 新闻 快讯
-
-# 多词主题
-uv run python wechat_editor_bot.py search --article-type news_flash --topic "特朗普 伊朗"
-# 实际搜索：特朗普 伊朗 最新 突发 新闻 快讯
+# 指定主题搜索（知识解读）
+uv run python wechat_editor_bot.py search --article-type knowledge_explanation --topic "量化宽松"
+# 实际搜索：量化宽松 知识解读 背景 分析 案例
 ```
 
 ### Exa 搜索模式
@@ -726,7 +692,7 @@ Exa API 支持多种搜索模式，通过模板中的 `search_type` 配置：
 **配置示例：**
 
 ```yaml
-# config/templates/news_flash.yaml
+# config/templates/financial_report.yaml
 news_search:
   search_type: "keyword"  # 使用精确关键词搜索
   use_autoprompt: false   # 禁用自动优化，避免查询偏移

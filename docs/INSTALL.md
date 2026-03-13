@@ -136,8 +136,8 @@ python wechat_editor_bot.py --mock
 # 财经日报
 python wechat_editor_bot.py --article-type financial_report
 
-# 科技资讯
-python wechat_editor_bot.py --article-type tech_news
+# 知识解读（需要指定主题）
+python wechat_editor_bot.py --article-type knowledge_explanation --topic "量化宽松"
 ```
 
 这将：
